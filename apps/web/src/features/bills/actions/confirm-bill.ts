@@ -20,6 +20,53 @@ export async function confirmBill(raw: unknown): Promise<void> {
   if (!bill) throw new Error("Fatura não encontrada");
 
   await prisma.$transaction(async (tx) => {
+    const selectedPayables = input.items.filter((i) => i.selected && i.direction === "PAYABLE");
+    const billTotal = selectedPayables.reduce((sum, i) => sum + i.amount, 0);
+    const billDueDate = selectedPayables[0]?.dueDate ?? input.items[0]?.dueDate;
+
+    let parentDebtId: string | null = null;
+    if (selectedPayables.length > 0 && billDueDate) {
+      const existingParent = await tx.debt.findFirst({
+        where: { billId: bill.id, billItemId: null },
+        select: { id: true },
+      });
+
+      if (existingParent) {
+        await tx.debt.update({
+          where: { id: existingParent.id },
+          data: {
+            title: "Fatura",
+            amount: billTotal,
+            category: "Fatura",
+            type: "VARIABLE",
+            recurrence: "MONTHLY",
+            direction: "PAYABLE",
+            dueDate: new Date(billDueDate),
+            status: "OPEN",
+          },
+        });
+        parentDebtId = existingParent.id;
+      } else {
+        const createdParent = await tx.debt.create({
+          data: {
+            userId: session.user.id,
+            billId: bill.id,
+            title: "Fatura",
+            amount: billTotal,
+            category: "Fatura",
+            type: "VARIABLE",
+            recurrence: "MONTHLY",
+            direction: "PAYABLE",
+            dueDate: new Date(billDueDate),
+            source: "BILL",
+            status: "OPEN",
+          },
+          select: { id: true },
+        });
+        parentDebtId = createdParent.id;
+      }
+    }
+
     for (const item of input.items) {
       await tx.billItem.update({
         where: { id: item.id },
@@ -53,6 +100,7 @@ export async function confirmBill(raw: unknown): Promise<void> {
             userId: session.user.id,
             billId: bill.id,
             billItemId: item.id,
+            parentDebtId: item.direction === "PAYABLE" ? parentDebtId : null,
             title: item.description,
             amount: item.amount,
             category: item.category,
@@ -65,6 +113,7 @@ export async function confirmBill(raw: unknown): Promise<void> {
             status: "OPEN",
           },
           update: {
+            parentDebtId: item.direction === "PAYABLE" ? parentDebtId : null,
             title: item.description,
             amount: item.amount,
             category: item.category,
@@ -78,6 +127,12 @@ export async function confirmBill(raw: unknown): Promise<void> {
       } else {
         await tx.debt.deleteMany({ where: { billItemId: item.id } });
       }
+    }
+
+    if (!parentDebtId) {
+      await tx.debt.deleteMany({
+        where: { billId: bill.id, billItemId: null },
+      });
     }
 
     await tx.bill.update({

@@ -62,31 +62,31 @@ export async function getDashboardData(
   ] = await Promise.all([
     prisma.debt.aggregate({
       _sum: { amount: true },
-      where: { userId, status: "OPEN", direction: "PAYABLE" },
+      where: { userId, parentDebtId: null, status: "OPEN", direction: "PAYABLE" },
     }),
     prisma.debt.aggregate({
       _sum: { amount: true },
-      where: { userId, direction: "PAYABLE", dueDate: { gte: monthStart, lte: monthEnd } },
+      where: { userId, parentDebtId: null, direction: "PAYABLE", dueDate: { gte: monthStart, lte: monthEnd } },
     }),
     prisma.debt.aggregate({
       _sum: { amount: true },
-      where: { userId, direction: "PAYABLE", dueDate: { gte: prevStart, lte: prevEnd } },
+      where: { userId, parentDebtId: null, direction: "PAYABLE", dueDate: { gte: prevStart, lte: prevEnd } },
     }),
     prisma.debt.findMany({
-      where: { userId, direction: "PAYABLE", dueDate: { gte: monthStart, lte: monthEnd } },
+      where: { userId, parentDebtId: null, direction: "PAYABLE", dueDate: { gte: monthStart, lte: monthEnd } },
       select: { amount: true, dueDate: true },
     }),
     sumIncomeInRange(userId, monthStart, monthEnd),
     sumIncomeInRange(userId, prevStart, prevEnd),
     groupIncomeByDay(userId, monthStart, monthEnd),
     prisma.income.aggregate({ _sum: { amount: true }, where: { userId } }),
-    prisma.debt.aggregate({ _sum: { amount: true }, where: { userId, status: "PAID", direction: "PAYABLE" } }),
+    prisma.debt.aggregate({ _sum: { amount: true }, where: { userId, parentDebtId: null, status: "PAID", direction: "PAYABLE" } }),
     prisma.debt.aggregate({
       _sum: { amount: true },
-      where: { userId, status: "OPEN", direction: "RECEIVABLE" },
+      where: { userId, parentDebtId: null, status: "OPEN", direction: "RECEIVABLE" },
     }),
     prisma.debt.findMany({
-      where: { userId, status: "OPEN", direction: "RECEIVABLE" },
+      where: { userId, parentDebtId: null, status: "OPEN", direction: "RECEIVABLE" },
       select: {
         personId: true,
         amount: true,

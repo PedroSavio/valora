@@ -2,6 +2,7 @@ import { Calendar, Receipt, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { deleteDebt } from "@/features/debts/actions/delete-debt";
+import { settleDebt } from "@/features/debts/actions/settle-debt";
 import { formatBRL, formatShortDate } from "@/lib/format";
 
 type Debt = {
@@ -11,6 +12,7 @@ type Debt = {
   category: string;
   status: string;
   source: string;
+  childCount: number;
   direction: "PAYABLE" | "RECEIVABLE";
   personName: string | null;
   dueDate: string;
@@ -42,11 +44,21 @@ export function DebtList({ debts }: { debts: Debt[] }) {
                 <Calendar className="size-3" />
                 {formatShortDate(d.dueDate.slice(0, 10))} · {directionLabel(d.direction)}
                 {d.personName ? ` · ${d.personName}` : ""} · {d.category} · {statusLabel(d.status)}
+                {d.childCount > 0 ? ` · ${d.childCount} itens` : ""}
+                {d.source === "BILL" && d.childCount > 0 ? " · Fatura" : ""}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm font-semibold">{formatBRL(d.amount)}</span>
+            <form action={settleDebt.bind(null, d.id)}>
+              <button
+                type="submit"
+                className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 text-xs font-medium hover:bg-card/70"
+              >
+                {d.status === "PAID" ? "Reabrir" : "Dar baixa"}
+              </button>
+            </form>
             <Link
               href={`/debts/${d.id}/edit`}
               className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 text-xs font-medium hover:bg-card/70"

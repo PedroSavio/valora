@@ -43,6 +43,7 @@ export default async function EditDebtPage({
           direction: debt.direction,
           personId: debt.personId,
           personName: "",
+          children: debt.children,
           dueDate: debt.dueDate,
           notes: debt.notes,
         }}

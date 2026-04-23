@@ -4,8 +4,10 @@ import type { DebtFilters } from "../schemas";
 export async function listDebts(userId: string, filters: DebtFilters = {}) {
   const where: {
     userId: string;
+    parentDebtId?: null;
     dueDate?: { gte: Date; lte: Date };
   } = { userId };
+  where.parentDebtId = null;
 
   if (filters.fromDate && filters.toDate) {
     where.dueDate = {
@@ -17,12 +19,13 @@ export async function listDebts(userId: string, filters: DebtFilters = {}) {
   const debts = await prisma.debt.findMany({
     where,
     orderBy: [{ status: "asc" }, { dueDate: "asc" }],
-    include: { person: true },
+    include: { person: true, childDebts: { select: { id: true } } },
   });
   return debts.map((d) => ({
     ...d,
     amount: Number(d.amount),
     personName: d.person?.name ?? null,
+    childCount: d.childDebts.length,
     dueDate: d.dueDate.toISOString(),
     createdAt: d.createdAt.toISOString(),
     updatedAt: d.updatedAt.toISOString(),
@@ -33,6 +36,12 @@ export async function listDebts(userId: string, filters: DebtFilters = {}) {
 export async function getDebtById(userId: string, id: string) {
   const debt = await prisma.debt.findFirst({
     where: { id, userId },
+    include: {
+      childDebts: {
+        orderBy: { createdAt: "asc" },
+        select: { id: true, title: true, amount: true },
+      },
+    },
   });
   if (!debt) return null;
 
@@ -47,6 +56,11 @@ export async function getDebtById(userId: string, id: string) {
     personId: debt.personId ?? "",
     dueDate: debt.dueDate.toISOString().slice(0, 10),
     notes: debt.notes ?? "",
+    children: debt.childDebts.map((c) => ({
+      id: c.id,
+      title: c.title,
+      amount: Number(c.amount),
+    })),
   };
 }
 
@@ -55,14 +69,14 @@ export async function listUpcomingDebts(userId: string, limit = 5) {
   today.setHours(0, 0, 0, 0);
 
   let debts = await prisma.debt.findMany({
-    where: { userId, status: "OPEN", direction: "PAYABLE", dueDate: { gte: today } },
+    where: { userId, parentDebtId: null, status: "OPEN", direction: "PAYABLE", dueDate: { gte: today } },
     orderBy: { dueDate: "asc" },
     take: limit,
   });
 
   if (debts.length === 0) {
     debts = await prisma.debt.findMany({
-      where: { userId, status: "OPEN", direction: "PAYABLE" },
+      where: { userId, parentDebtId: null, status: "OPEN", direction: "PAYABLE" },
       orderBy: { dueDate: "asc" },
       take: limit,
     });

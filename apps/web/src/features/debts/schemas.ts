@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const debtChildSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(2, "Mínimo 2 caracteres"),
+  amount: z.coerce.number().positive("Valor deve ser positivo"),
+});
+
 export const createDebtSchema = z.object({
   title: z.string().min(2, "Mínimo 2 caracteres"),
   amount: z.coerce.number().positive("Valor deve ser positivo"),
@@ -9,6 +15,7 @@ export const createDebtSchema = z.object({
   direction: z.enum(["PAYABLE", "RECEIVABLE"]),
   personId: z.string().optional(),
   personName: z.string().optional(),
+  children: z.array(debtChildSchema).optional(),
   dueDate: z.string().min(1, "Obrigatório"),
   notes: z.string().optional(),
 }).superRefine((data, ctx) => {

@@ -27,6 +27,8 @@ build
 **/.mcp.jsonc
 
 # IDEs and editors
+.claude/
+.cursor/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

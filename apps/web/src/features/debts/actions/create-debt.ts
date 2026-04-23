@@ -27,22 +27,62 @@ export async function createDebt(raw: unknown): Promise<void> {
       personId = created.id;
     }
 
-    await tx.debt.create({
-      data: {
-        userId: session.user.id,
-        title: input.title,
-        amount: input.amount,
-        category: input.category,
-        type: input.type,
-        recurrence: input.recurrence,
-        direction: input.direction,
-        personId,
-        dueDate: new Date(input.dueDate),
-        notes: input.notes,
-        source: "MANUAL",
-        status: "OPEN",
-      },
-    });
+    const children = (input.children ?? []).filter((c) => c.title.trim().length > 0);
+
+    if (children.length > 0) {
+      const parentAmount = children.reduce((sum, c) => sum + c.amount, 0);
+      const parent = await tx.debt.create({
+        data: {
+          userId: session.user.id,
+          title: input.title,
+          amount: parentAmount,
+          category: input.category,
+          type: input.type,
+          recurrence: input.recurrence,
+          direction: input.direction,
+          personId,
+          dueDate: new Date(input.dueDate),
+          notes: input.notes,
+          source: "MANUAL",
+          status: "OPEN",
+        },
+        select: { id: true },
+      });
+
+      await tx.debt.createMany({
+        data: children.map((child) => ({
+          userId: session.user.id,
+          parentDebtId: parent.id,
+          title: child.title.trim(),
+          amount: child.amount,
+          category: input.category,
+          type: input.type,
+          recurrence: input.recurrence,
+          direction: input.direction,
+          personId: input.direction === "RECEIVABLE" ? personId : null,
+          dueDate: new Date(input.dueDate),
+          source: "MANUAL",
+          status: "OPEN",
+        })),
+      });
+    } else {
+      await tx.debt.create({
+        data: {
+          userId: session.user.id,
+          title: input.title,
+          amount: input.amount,
+          category: input.category,
+          type: input.type,
+          recurrence: input.recurrence,
+          direction: input.direction,
+          personId,
+          dueDate: new Date(input.dueDate),
+          notes: input.notes,
+          source: "MANUAL",
+          status: "OPEN",
+        },
+      });
+    }
   });
 
   redirect("/debts");

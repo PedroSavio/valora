@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { createDebt } from "../actions/create-debt";
@@ -34,6 +34,7 @@ type DebtFormValues = {
   direction: "PAYABLE" | "RECEIVABLE";
   personId: string;
   personName: string;
+  children?: { id?: string; title: string; amount: number }[];
   dueDate: string;
   notes: string;
 };
@@ -47,6 +48,15 @@ type DebtFormProps = {
 
 export function DebtForm({ relatedPeople, mode = "create", debtId, initialValues }: DebtFormProps) {
   const [isPending, startTransition] = useTransition();
+  const [hasChildren, setHasChildren] = useState<boolean>((initialValues?.children?.length ?? 0) > 0);
+  const [children, setChildren] = useState<{ id?: string; title: string; amount: number }[]>(
+    initialValues?.children ?? [],
+  );
+
+  const childrenTotal = useMemo(
+    () => children.reduce((sum, child) => sum + (Number.isFinite(child.amount) ? child.amount : 0), 0),
+    [children],
+  );
 
   const form = useForm({
     defaultValues:
@@ -60,6 +70,7 @@ export function DebtForm({ relatedPeople, mode = "create", debtId, initialValues
         direction: "PAYABLE",
         personId: "",
         personName: "",
+        children: [],
         dueDate: new Date().toISOString().slice(0, 10),
         notes: "",
       } satisfies DebtFormValues),
@@ -69,9 +80,18 @@ export function DebtForm({ relatedPeople, mode = "create", debtId, initialValues
         try {
           if (mode === "edit") {
             if (!debtId) throw new Error("debt_id_required");
-            await updateDebt({ id: debtId, ...value });
+            await updateDebt({
+              id: debtId,
+              ...value,
+              amount: hasChildren ? childrenTotal : value.amount,
+              children: hasChildren ? children : [],
+            });
           } else {
-            await createDebt(value);
+            await createDebt({
+              ...value,
+              amount: hasChildren ? childrenTotal : value.amount,
+              children: hasChildren ? children : [],
+            });
           }
         } catch (err) {
           toast.error(err instanceof Error ? err.message : "Falha ao salvar");
@@ -125,8 +145,9 @@ export function DebtForm({ relatedPeople, mode = "create", debtId, initialValues
               type="number"
               step="0.01"
               className={inputCls}
-              value={field.state.value}
+              value={hasChildren ? childrenTotal : field.state.value}
               onChange={(e) => field.handleChange(Number(e.target.value))}
+              readOnly={hasChildren}
             />
           </Field>
         )}
@@ -245,6 +266,84 @@ export function DebtForm({ relatedPeople, mode = "create", debtId, initialValues
           </Field>
         )}
       </form.Field>
+
+      <div className="sm:col-span-2 rounded-[14px] border border-border bg-card p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="text-sm font-medium">Itens da dívida (filhas)</p>
+          <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={hasChildren}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setHasChildren(checked);
+                if (checked && children.length === 0) {
+                  setChildren([{ title: "", amount: 0 }]);
+                }
+                if (!checked) {
+                  setChildren([]);
+                }
+              }}
+              className="size-4 accent-primary"
+            />
+            Esta dívida possui itens
+          </label>
+        </div>
+        {hasChildren ? (
+          <div className="space-y-3">
+            {children.map((child, index) => (
+              <div key={child.id ?? `new-${index}`} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_180px_auto]">
+                <input
+                  className={inputCls}
+                  placeholder="Descrição do item"
+                  value={child.title}
+                  onChange={(e) =>
+                    setChildren((curr) =>
+                      curr.map((c, i) => (i === index ? { ...c, title: e.target.value } : c)),
+                    )
+                  }
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  className={inputCls}
+                  placeholder="Valor"
+                  value={child.amount}
+                  onChange={(e) =>
+                    setChildren((curr) =>
+                      curr.map((c, i) => (i === index ? { ...c, amount: Number(e.target.value) } : c)),
+                    )
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setChildren((curr) => curr.filter((_, i) => i !== index))}
+                  className="rounded-md border border-border px-3 py-2 text-xs font-medium text-destructive hover:bg-destructive/10"
+                >
+                  Remover
+                </button>
+              </div>
+            ))}
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setChildren((curr) => [...curr, { title: "", amount: 0 }])}
+                className="rounded-md border border-border px-3 py-2 text-xs font-medium hover:bg-card/70"
+              >
+                Adicionar item
+              </button>
+              <p className="text-sm text-muted-foreground">
+                Total dos itens: <span className="font-semibold text-foreground">{childrenTotal.toFixed(2)}</span>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Quando ativado, o valor da dívida pai será calculado automaticamente pela soma dos itens.
+          </p>
+        )}
+      </div>
 
       <div className="sm:col-span-2">
         <button

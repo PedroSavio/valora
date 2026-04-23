@@ -27,7 +27,10 @@
     "build": "turbo build",
     "check-types": "turbo check-types",
     "dev:web": "turbo -F web dev",
-    "check": "biome check --write ."
+    "check": "biome check --write .",
+    "db:migrate": "bun --cwd packages/auth run db:migrate",
+    "db:generate": "bun --cwd packages/auth run db:generate",
+    "db:regen": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object { $_.ProcessName -match 'node|bun|next|prisma' } | Stop-Process -Force -ErrorAction SilentlyContinue; Remove-Item -Force 'packages/auth/src/generated/prisma/query_engine-windows.dll.node*' -ErrorAction SilentlyContinue; bun --cwd packages/auth run db:generate\""
   },
   "dependencies": {
     "@valora/env": "workspace:*",
