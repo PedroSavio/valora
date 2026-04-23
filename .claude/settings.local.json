@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "Bash(npx -y figma-developer-mcp --version)",
+      "mcp__figma__get_figma_data",
+      "Bash(bun install *)",
+      "Bash(bun run *)"
+    ]
+  }
+}

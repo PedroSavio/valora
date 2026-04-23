@@ -1,0 +1,21 @@
+{
+  "name": "@valora/ai",
+  "type": "module",
+  "exports": {
+    ".": { "default": "./src/index.ts" },
+    "./classify-bill": { "default": "./src/classify-bill.ts" }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@ai-sdk/anthropic": "^2.0.0",
+    "@ai-sdk/openai": "^2.0.0",
+    "@valora/env": "workspace:*",
+    "ai": "^5.0.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "@valora/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

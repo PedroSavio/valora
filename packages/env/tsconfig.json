@@ -1,0 +1,3 @@
+{
+  "extends": "@valora/config/tsconfig.base.json"
+}
