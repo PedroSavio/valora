@@ -219,6 +219,7 @@ exports.Prisma.DebtScalarFieldEnum = {
   userId: 'userId',
   billId: 'billId',
   billItemId: 'billItemId',
+  parentDebtId: 'parentDebtId',
   personId: 'personId',
   title: 'title',
   amount: 'amount',

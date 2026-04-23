@@ -1706,6 +1706,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type DebtCountOutputType
+   */
+
+  export type DebtCountOutputType = {
+    childDebts: number
+  }
+
+  export type DebtCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    childDebts?: boolean | DebtCountOutputTypeCountChildDebtsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * DebtCountOutputType without action
+   */
+  export type DebtCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DebtCountOutputType
+     */
+    select?: DebtCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * DebtCountOutputType without action
+   */
+  export type DebtCountOutputTypeCountChildDebtsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DebtWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -9243,6 +9274,7 @@ export namespace Prisma {
     userId: string | null
     billId: string | null
     billItemId: string | null
+    parentDebtId: string | null
     personId: string | null
     title: string | null
     amount: Decimal | null
@@ -9264,6 +9296,7 @@ export namespace Prisma {
     userId: string | null
     billId: string | null
     billItemId: string | null
+    parentDebtId: string | null
     personId: string | null
     title: string | null
     amount: Decimal | null
@@ -9285,6 +9318,7 @@ export namespace Prisma {
     userId: number
     billId: number
     billItemId: number
+    parentDebtId: number
     personId: number
     title: number
     amount: number
@@ -9316,6 +9350,7 @@ export namespace Prisma {
     userId?: true
     billId?: true
     billItemId?: true
+    parentDebtId?: true
     personId?: true
     title?: true
     amount?: true
@@ -9337,6 +9372,7 @@ export namespace Prisma {
     userId?: true
     billId?: true
     billItemId?: true
+    parentDebtId?: true
     personId?: true
     title?: true
     amount?: true
@@ -9358,6 +9394,7 @@ export namespace Prisma {
     userId?: true
     billId?: true
     billItemId?: true
+    parentDebtId?: true
     personId?: true
     title?: true
     amount?: true
@@ -9466,6 +9503,7 @@ export namespace Prisma {
     userId: string
     billId: string | null
     billItemId: string | null
+    parentDebtId: string | null
     personId: string | null
     title: string
     amount: Decimal
@@ -9506,6 +9544,7 @@ export namespace Prisma {
     userId?: boolean
     billId?: boolean
     billItemId?: boolean
+    parentDebtId?: boolean
     personId?: boolean
     title?: boolean
     amount?: boolean
@@ -9522,7 +9561,10 @@ export namespace Prisma {
     updatedAt?: boolean
     bill?: boolean | Debt$billArgs<ExtArgs>
     billItem?: boolean | Debt$billItemArgs<ExtArgs>
+    parentDebt?: boolean | Debt$parentDebtArgs<ExtArgs>
+    childDebts?: boolean | Debt$childDebtsArgs<ExtArgs>
     person?: boolean | Debt$personArgs<ExtArgs>
+    _count?: boolean | DebtCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["debt"]>
 
 
@@ -9531,6 +9573,7 @@ export namespace Prisma {
     userId?: boolean
     billId?: boolean
     billItemId?: boolean
+    parentDebtId?: boolean
     personId?: boolean
     title?: boolean
     amount?: boolean
@@ -9550,7 +9593,10 @@ export namespace Prisma {
   export type DebtInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     bill?: boolean | Debt$billArgs<ExtArgs>
     billItem?: boolean | Debt$billItemArgs<ExtArgs>
+    parentDebt?: boolean | Debt$parentDebtArgs<ExtArgs>
+    childDebts?: boolean | Debt$childDebtsArgs<ExtArgs>
     person?: boolean | Debt$personArgs<ExtArgs>
+    _count?: boolean | DebtCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $DebtPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9558,6 +9604,8 @@ export namespace Prisma {
     objects: {
       bill: Prisma.$BillPayload<ExtArgs> | null
       billItem: Prisma.$BillItemPayload<ExtArgs> | null
+      parentDebt: Prisma.$DebtPayload<ExtArgs> | null
+      childDebts: Prisma.$DebtPayload<ExtArgs>[]
       person: Prisma.$RelatedPersonPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -9565,6 +9613,7 @@ export namespace Prisma {
       userId: string
       billId: string | null
       billItemId: string | null
+      parentDebtId: string | null
       personId: string | null
       title: string
       amount: Prisma.Decimal
@@ -9921,6 +9970,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     bill<T extends Debt$billArgs<ExtArgs> = {}>(args?: Subset<T, Debt$billArgs<ExtArgs>>): Prisma__BillClient<$Result.GetResult<Prisma.$BillPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     billItem<T extends Debt$billItemArgs<ExtArgs> = {}>(args?: Subset<T, Debt$billItemArgs<ExtArgs>>): Prisma__BillItemClient<$Result.GetResult<Prisma.$BillItemPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    parentDebt<T extends Debt$parentDebtArgs<ExtArgs> = {}>(args?: Subset<T, Debt$parentDebtArgs<ExtArgs>>): Prisma__DebtClient<$Result.GetResult<Prisma.$DebtPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    childDebts<T extends Debt$childDebtsArgs<ExtArgs> = {}>(args?: Subset<T, Debt$childDebtsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DebtPayload<ExtArgs>, T, "findMany"> | Null>
     person<T extends Debt$personArgs<ExtArgs> = {}>(args?: Subset<T, Debt$personArgs<ExtArgs>>): Prisma__RelatedPersonClient<$Result.GetResult<Prisma.$RelatedPersonPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -9955,6 +10006,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Debt", 'String'>
     readonly billId: FieldRef<"Debt", 'String'>
     readonly billItemId: FieldRef<"Debt", 'String'>
+    readonly parentDebtId: FieldRef<"Debt", 'String'>
     readonly personId: FieldRef<"Debt", 'String'>
     readonly title: FieldRef<"Debt", 'String'>
     readonly amount: FieldRef<"Debt", 'Decimal'>
@@ -10298,6 +10350,41 @@ export namespace Prisma {
   }
 
   /**
+   * Debt.parentDebt
+   */
+  export type Debt$parentDebtArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Debt
+     */
+    select?: DebtSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DebtInclude<ExtArgs> | null
+    where?: DebtWhereInput
+  }
+
+  /**
+   * Debt.childDebts
+   */
+  export type Debt$childDebtsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Debt
+     */
+    select?: DebtSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DebtInclude<ExtArgs> | null
+    where?: DebtWhereInput
+    orderBy?: DebtOrderByWithRelationInput | DebtOrderByWithRelationInput[]
+    cursor?: DebtWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DebtScalarFieldEnum | DebtScalarFieldEnum[]
+  }
+
+  /**
    * Debt.person
    */
   export type Debt$personArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -10462,6 +10549,7 @@ export namespace Prisma {
     userId: 'userId',
     billId: 'billId',
     billItemId: 'billItemId',
+    parentDebtId: 'parentDebtId',
     personId: 'personId',
     title: 'title',
     amount: 'amount',
@@ -11192,6 +11280,7 @@ export namespace Prisma {
     userId?: StringFilter<"Debt"> | string
     billId?: StringNullableFilter<"Debt"> | string | null
     billItemId?: StringNullableFilter<"Debt"> | string | null
+    parentDebtId?: StringNullableFilter<"Debt"> | string | null
     personId?: StringNullableFilter<"Debt"> | string | null
     title?: StringFilter<"Debt"> | string
     amount?: DecimalFilter<"Debt"> | Decimal | DecimalJsLike | number | string
@@ -11208,6 +11297,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Debt"> | Date | string
     bill?: XOR<BillNullableRelationFilter, BillWhereInput> | null
     billItem?: XOR<BillItemNullableRelationFilter, BillItemWhereInput> | null
+    parentDebt?: XOR<DebtNullableRelationFilter, DebtWhereInput> | null
+    childDebts?: DebtListRelationFilter
     person?: XOR<RelatedPersonNullableRelationFilter, RelatedPersonWhereInput> | null
   }
 
@@ -11216,6 +11307,7 @@ export namespace Prisma {
     userId?: SortOrder
     billId?: SortOrderInput | SortOrder
     billItemId?: SortOrderInput | SortOrder
+    parentDebtId?: SortOrderInput | SortOrder
     personId?: SortOrderInput | SortOrder
     title?: SortOrder
     amount?: SortOrder
@@ -11232,6 +11324,8 @@ export namespace Prisma {
     updatedAt?: SortOrder
     bill?: BillOrderByWithRelationInput
     billItem?: BillItemOrderByWithRelationInput
+    parentDebt?: DebtOrderByWithRelationInput
+    childDebts?: DebtOrderByRelationAggregateInput
     person?: RelatedPersonOrderByWithRelationInput
   }
 
@@ -11243,6 +11337,7 @@ export namespace Prisma {
     NOT?: DebtWhereInput | DebtWhereInput[]
     userId?: StringFilter<"Debt"> | string
     billId?: StringNullableFilter<"Debt"> | string | null
+    parentDebtId?: StringNullableFilter<"Debt"> | string | null
     personId?: StringNullableFilter<"Debt"> | string | null
     title?: StringFilter<"Debt"> | string
     amount?: DecimalFilter<"Debt"> | Decimal | DecimalJsLike | number | string
@@ -11259,6 +11354,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Debt"> | Date | string
     bill?: XOR<BillNullableRelationFilter, BillWhereInput> | null
     billItem?: XOR<BillItemNullableRelationFilter, BillItemWhereInput> | null
+    parentDebt?: XOR<DebtNullableRelationFilter, DebtWhereInput> | null
+    childDebts?: DebtListRelationFilter
     person?: XOR<RelatedPersonNullableRelationFilter, RelatedPersonWhereInput> | null
   }, "id" | "billItemId">
 
@@ -11267,6 +11364,7 @@ export namespace Prisma {
     userId?: SortOrder
     billId?: SortOrderInput | SortOrder
     billItemId?: SortOrderInput | SortOrder
+    parentDebtId?: SortOrderInput | SortOrder
     personId?: SortOrderInput | SortOrder
     title?: SortOrder
     amount?: SortOrder
@@ -11296,6 +11394,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Debt"> | string
     billId?: StringNullableWithAggregatesFilter<"Debt"> | string | null
     billItemId?: StringNullableWithAggregatesFilter<"Debt"> | string | null
+    parentDebtId?: StringNullableWithAggregatesFilter<"Debt"> | string | null
     personId?: StringNullableWithAggregatesFilter<"Debt"> | string | null
     title?: StringWithAggregatesFilter<"Debt"> | string
     amount?: DecimalWithAggregatesFilter<"Debt"> | Decimal | DecimalJsLike | number | string
@@ -11998,6 +12097,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     bill?: BillCreateNestedOneWithoutDebtsInput
     billItem?: BillItemCreateNestedOneWithoutDebtInput
+    parentDebt?: DebtCreateNestedOneWithoutChildDebtsInput
+    childDebts?: DebtCreateNestedManyWithoutParentDebtInput
     person?: RelatedPersonCreateNestedOneWithoutDebtsInput
   }
 
@@ -12006,6 +12107,7 @@ export namespace Prisma {
     userId: string
     billId?: string | null
     billItemId?: string | null
+    parentDebtId?: string | null
     personId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
@@ -12020,6 +12122,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    childDebts?: DebtUncheckedCreateNestedManyWithoutParentDebtInput
   }
 
   export type DebtUpdateInput = {
@@ -12040,6 +12143,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bill?: BillUpdateOneWithoutDebtsNestedInput
     billItem?: BillItemUpdateOneWithoutDebtNestedInput
+    parentDebt?: DebtUpdateOneWithoutChildDebtsNestedInput
+    childDebts?: DebtUpdateManyWithoutParentDebtNestedInput
     person?: RelatedPersonUpdateOneWithoutDebtsNestedInput
   }
 
@@ -12048,6 +12153,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     billId?: NullableStringFieldUpdateOperationsInput | string | null
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     personId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -12062,6 +12168,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childDebts?: DebtUncheckedUpdateManyWithoutParentDebtNestedInput
   }
 
   export type DebtCreateManyInput = {
@@ -12069,6 +12176,7 @@ export namespace Prisma {
     userId: string
     billId?: string | null
     billItemId?: string | null
+    parentDebtId?: string | null
     personId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
@@ -12108,6 +12216,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     billId?: NullableStringFieldUpdateOperationsInput | string | null
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     personId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -12755,6 +12864,7 @@ export namespace Prisma {
     userId?: SortOrder
     billId?: SortOrder
     billItemId?: SortOrder
+    parentDebtId?: SortOrder
     personId?: SortOrder
     title?: SortOrder
     amount?: SortOrder
@@ -12780,6 +12890,7 @@ export namespace Prisma {
     userId?: SortOrder
     billId?: SortOrder
     billItemId?: SortOrder
+    parentDebtId?: SortOrder
     personId?: SortOrder
     title?: SortOrder
     amount?: SortOrder
@@ -12801,6 +12912,7 @@ export namespace Prisma {
     userId?: SortOrder
     billId?: SortOrder
     billItemId?: SortOrder
+    parentDebtId?: SortOrder
     personId?: SortOrder
     title?: SortOrder
     amount?: SortOrder
@@ -13247,10 +13359,30 @@ export namespace Prisma {
     connect?: BillItemWhereUniqueInput
   }
 
+  export type DebtCreateNestedOneWithoutChildDebtsInput = {
+    create?: XOR<DebtCreateWithoutChildDebtsInput, DebtUncheckedCreateWithoutChildDebtsInput>
+    connectOrCreate?: DebtCreateOrConnectWithoutChildDebtsInput
+    connect?: DebtWhereUniqueInput
+  }
+
+  export type DebtCreateNestedManyWithoutParentDebtInput = {
+    create?: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput> | DebtCreateWithoutParentDebtInput[] | DebtUncheckedCreateWithoutParentDebtInput[]
+    connectOrCreate?: DebtCreateOrConnectWithoutParentDebtInput | DebtCreateOrConnectWithoutParentDebtInput[]
+    createMany?: DebtCreateManyParentDebtInputEnvelope
+    connect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+  }
+
   export type RelatedPersonCreateNestedOneWithoutDebtsInput = {
     create?: XOR<RelatedPersonCreateWithoutDebtsInput, RelatedPersonUncheckedCreateWithoutDebtsInput>
     connectOrCreate?: RelatedPersonCreateOrConnectWithoutDebtsInput
     connect?: RelatedPersonWhereUniqueInput
+  }
+
+  export type DebtUncheckedCreateNestedManyWithoutParentDebtInput = {
+    create?: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput> | DebtCreateWithoutParentDebtInput[] | DebtUncheckedCreateWithoutParentDebtInput[]
+    connectOrCreate?: DebtCreateOrConnectWithoutParentDebtInput | DebtCreateOrConnectWithoutParentDebtInput[]
+    createMany?: DebtCreateManyParentDebtInputEnvelope
+    connect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
   }
 
   export type EnumDebtDirectionFieldUpdateOperationsInput = {
@@ -13285,6 +13417,30 @@ export namespace Prisma {
     update?: XOR<XOR<BillItemUpdateToOneWithWhereWithoutDebtInput, BillItemUpdateWithoutDebtInput>, BillItemUncheckedUpdateWithoutDebtInput>
   }
 
+  export type DebtUpdateOneWithoutChildDebtsNestedInput = {
+    create?: XOR<DebtCreateWithoutChildDebtsInput, DebtUncheckedCreateWithoutChildDebtsInput>
+    connectOrCreate?: DebtCreateOrConnectWithoutChildDebtsInput
+    upsert?: DebtUpsertWithoutChildDebtsInput
+    disconnect?: DebtWhereInput | boolean
+    delete?: DebtWhereInput | boolean
+    connect?: DebtWhereUniqueInput
+    update?: XOR<XOR<DebtUpdateToOneWithWhereWithoutChildDebtsInput, DebtUpdateWithoutChildDebtsInput>, DebtUncheckedUpdateWithoutChildDebtsInput>
+  }
+
+  export type DebtUpdateManyWithoutParentDebtNestedInput = {
+    create?: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput> | DebtCreateWithoutParentDebtInput[] | DebtUncheckedCreateWithoutParentDebtInput[]
+    connectOrCreate?: DebtCreateOrConnectWithoutParentDebtInput | DebtCreateOrConnectWithoutParentDebtInput[]
+    upsert?: DebtUpsertWithWhereUniqueWithoutParentDebtInput | DebtUpsertWithWhereUniqueWithoutParentDebtInput[]
+    createMany?: DebtCreateManyParentDebtInputEnvelope
+    set?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    disconnect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    delete?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    connect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    update?: DebtUpdateWithWhereUniqueWithoutParentDebtInput | DebtUpdateWithWhereUniqueWithoutParentDebtInput[]
+    updateMany?: DebtUpdateManyWithWhereWithoutParentDebtInput | DebtUpdateManyWithWhereWithoutParentDebtInput[]
+    deleteMany?: DebtScalarWhereInput | DebtScalarWhereInput[]
+  }
+
   export type RelatedPersonUpdateOneWithoutDebtsNestedInput = {
     create?: XOR<RelatedPersonCreateWithoutDebtsInput, RelatedPersonUncheckedCreateWithoutDebtsInput>
     connectOrCreate?: RelatedPersonCreateOrConnectWithoutDebtsInput
@@ -13293,6 +13449,20 @@ export namespace Prisma {
     delete?: RelatedPersonWhereInput | boolean
     connect?: RelatedPersonWhereUniqueInput
     update?: XOR<XOR<RelatedPersonUpdateToOneWithWhereWithoutDebtsInput, RelatedPersonUpdateWithoutDebtsInput>, RelatedPersonUncheckedUpdateWithoutDebtsInput>
+  }
+
+  export type DebtUncheckedUpdateManyWithoutParentDebtNestedInput = {
+    create?: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput> | DebtCreateWithoutParentDebtInput[] | DebtUncheckedCreateWithoutParentDebtInput[]
+    connectOrCreate?: DebtCreateOrConnectWithoutParentDebtInput | DebtCreateOrConnectWithoutParentDebtInput[]
+    upsert?: DebtUpsertWithWhereUniqueWithoutParentDebtInput | DebtUpsertWithWhereUniqueWithoutParentDebtInput[]
+    createMany?: DebtCreateManyParentDebtInputEnvelope
+    set?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    disconnect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    delete?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    connect?: DebtWhereUniqueInput | DebtWhereUniqueInput[]
+    update?: DebtUpdateWithWhereUniqueWithoutParentDebtInput | DebtUpdateWithWhereUniqueWithoutParentDebtInput[]
+    updateMany?: DebtUpdateManyWithWhereWithoutParentDebtInput | DebtUpdateManyWithWhereWithoutParentDebtInput[]
+    deleteMany?: DebtScalarWhereInput | DebtScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -13832,6 +14002,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     bill?: BillCreateNestedOneWithoutDebtsInput
     billItem?: BillItemCreateNestedOneWithoutDebtInput
+    parentDebt?: DebtCreateNestedOneWithoutChildDebtsInput
+    childDebts?: DebtCreateNestedManyWithoutParentDebtInput
   }
 
   export type DebtUncheckedCreateWithoutPersonInput = {
@@ -13839,6 +14011,7 @@ export namespace Prisma {
     userId: string
     billId?: string | null
     billItemId?: string | null
+    parentDebtId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
     category: string
@@ -13852,6 +14025,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    childDebts?: DebtUncheckedCreateNestedManyWithoutParentDebtInput
   }
 
   export type DebtCreateOrConnectWithoutPersonInput = {
@@ -13923,6 +14097,7 @@ export namespace Prisma {
     userId?: StringFilter<"Debt"> | string
     billId?: StringNullableFilter<"Debt"> | string | null
     billItemId?: StringNullableFilter<"Debt"> | string | null
+    parentDebtId?: StringNullableFilter<"Debt"> | string | null
     personId?: StringNullableFilter<"Debt"> | string | null
     title?: StringFilter<"Debt"> | string
     amount?: DecimalFilter<"Debt"> | Decimal | DecimalJsLike | number | string
@@ -14118,6 +14293,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     billItem?: BillItemCreateNestedOneWithoutDebtInput
+    parentDebt?: DebtCreateNestedOneWithoutChildDebtsInput
+    childDebts?: DebtCreateNestedManyWithoutParentDebtInput
     person?: RelatedPersonCreateNestedOneWithoutDebtsInput
   }
 
@@ -14125,6 +14302,7 @@ export namespace Prisma {
     id?: string
     userId: string
     billItemId?: string | null
+    parentDebtId?: string | null
     personId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
@@ -14139,6 +14317,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    childDebts?: DebtUncheckedCreateNestedManyWithoutParentDebtInput
   }
 
   export type DebtCreateOrConnectWithoutBillInput = {
@@ -14246,6 +14425,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     bill?: BillCreateNestedOneWithoutDebtsInput
+    parentDebt?: DebtCreateNestedOneWithoutChildDebtsInput
+    childDebts?: DebtCreateNestedManyWithoutParentDebtInput
     person?: RelatedPersonCreateNestedOneWithoutDebtsInput
   }
 
@@ -14253,6 +14434,7 @@ export namespace Prisma {
     id?: string
     userId: string
     billId?: string | null
+    parentDebtId?: string | null
     personId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
@@ -14267,6 +14449,7 @@ export namespace Prisma {
     notes?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    childDebts?: DebtUncheckedCreateNestedManyWithoutParentDebtInput
   }
 
   export type DebtCreateOrConnectWithoutBillItemInput = {
@@ -14339,6 +14522,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bill?: BillUpdateOneWithoutDebtsNestedInput
+    parentDebt?: DebtUpdateOneWithoutChildDebtsNestedInput
+    childDebts?: DebtUpdateManyWithoutParentDebtNestedInput
     person?: RelatedPersonUpdateOneWithoutDebtsNestedInput
   }
 
@@ -14346,6 +14531,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     billId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     personId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -14360,6 +14546,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childDebts?: DebtUncheckedUpdateManyWithoutParentDebtNestedInput
   }
 
   export type BillCreateWithoutDebtsInput = {
@@ -14420,6 +14607,109 @@ export namespace Prisma {
   export type BillItemCreateOrConnectWithoutDebtInput = {
     where: BillItemWhereUniqueInput
     create: XOR<BillItemCreateWithoutDebtInput, BillItemUncheckedCreateWithoutDebtInput>
+  }
+
+  export type DebtCreateWithoutChildDebtsInput = {
+    id?: string
+    userId: string
+    title: string
+    amount: Decimal | DecimalJsLike | number | string
+    category: string
+    type?: $Enums.BillItemType
+    recurrence?: $Enums.Recurrence
+    direction?: $Enums.DebtDirection
+    status?: $Enums.DebtStatus
+    source?: $Enums.DebtSource
+    dueDate: Date | string
+    paidAt?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bill?: BillCreateNestedOneWithoutDebtsInput
+    billItem?: BillItemCreateNestedOneWithoutDebtInput
+    parentDebt?: DebtCreateNestedOneWithoutChildDebtsInput
+    person?: RelatedPersonCreateNestedOneWithoutDebtsInput
+  }
+
+  export type DebtUncheckedCreateWithoutChildDebtsInput = {
+    id?: string
+    userId: string
+    billId?: string | null
+    billItemId?: string | null
+    parentDebtId?: string | null
+    personId?: string | null
+    title: string
+    amount: Decimal | DecimalJsLike | number | string
+    category: string
+    type?: $Enums.BillItemType
+    recurrence?: $Enums.Recurrence
+    direction?: $Enums.DebtDirection
+    status?: $Enums.DebtStatus
+    source?: $Enums.DebtSource
+    dueDate: Date | string
+    paidAt?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DebtCreateOrConnectWithoutChildDebtsInput = {
+    where: DebtWhereUniqueInput
+    create: XOR<DebtCreateWithoutChildDebtsInput, DebtUncheckedCreateWithoutChildDebtsInput>
+  }
+
+  export type DebtCreateWithoutParentDebtInput = {
+    id?: string
+    userId: string
+    title: string
+    amount: Decimal | DecimalJsLike | number | string
+    category: string
+    type?: $Enums.BillItemType
+    recurrence?: $Enums.Recurrence
+    direction?: $Enums.DebtDirection
+    status?: $Enums.DebtStatus
+    source?: $Enums.DebtSource
+    dueDate: Date | string
+    paidAt?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    bill?: BillCreateNestedOneWithoutDebtsInput
+    billItem?: BillItemCreateNestedOneWithoutDebtInput
+    childDebts?: DebtCreateNestedManyWithoutParentDebtInput
+    person?: RelatedPersonCreateNestedOneWithoutDebtsInput
+  }
+
+  export type DebtUncheckedCreateWithoutParentDebtInput = {
+    id?: string
+    userId: string
+    billId?: string | null
+    billItemId?: string | null
+    personId?: string | null
+    title: string
+    amount: Decimal | DecimalJsLike | number | string
+    category: string
+    type?: $Enums.BillItemType
+    recurrence?: $Enums.Recurrence
+    direction?: $Enums.DebtDirection
+    status?: $Enums.DebtStatus
+    source?: $Enums.DebtSource
+    dueDate: Date | string
+    paidAt?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    childDebts?: DebtUncheckedCreateNestedManyWithoutParentDebtInput
+  }
+
+  export type DebtCreateOrConnectWithoutParentDebtInput = {
+    where: DebtWhereUniqueInput
+    create: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput>
+  }
+
+  export type DebtCreateManyParentDebtInputEnvelope = {
+    data: DebtCreateManyParentDebtInput | DebtCreateManyParentDebtInput[]
+    skipDuplicates?: boolean
   }
 
   export type RelatedPersonCreateWithoutDebtsInput = {
@@ -14519,6 +14809,77 @@ export namespace Prisma {
     recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
     selected?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DebtUpsertWithoutChildDebtsInput = {
+    update: XOR<DebtUpdateWithoutChildDebtsInput, DebtUncheckedUpdateWithoutChildDebtsInput>
+    create: XOR<DebtCreateWithoutChildDebtsInput, DebtUncheckedCreateWithoutChildDebtsInput>
+    where?: DebtWhereInput
+  }
+
+  export type DebtUpdateToOneWithWhereWithoutChildDebtsInput = {
+    where?: DebtWhereInput
+    data: XOR<DebtUpdateWithoutChildDebtsInput, DebtUncheckedUpdateWithoutChildDebtsInput>
+  }
+
+  export type DebtUpdateWithoutChildDebtsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    category?: StringFieldUpdateOperationsInput | string
+    type?: EnumBillItemTypeFieldUpdateOperationsInput | $Enums.BillItemType
+    recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
+    direction?: EnumDebtDirectionFieldUpdateOperationsInput | $Enums.DebtDirection
+    status?: EnumDebtStatusFieldUpdateOperationsInput | $Enums.DebtStatus
+    source?: EnumDebtSourceFieldUpdateOperationsInput | $Enums.DebtSource
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bill?: BillUpdateOneWithoutDebtsNestedInput
+    billItem?: BillItemUpdateOneWithoutDebtNestedInput
+    parentDebt?: DebtUpdateOneWithoutChildDebtsNestedInput
+    person?: RelatedPersonUpdateOneWithoutDebtsNestedInput
+  }
+
+  export type DebtUncheckedUpdateWithoutChildDebtsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    billId?: NullableStringFieldUpdateOperationsInput | string | null
+    billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
+    personId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    category?: StringFieldUpdateOperationsInput | string
+    type?: EnumBillItemTypeFieldUpdateOperationsInput | $Enums.BillItemType
+    recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
+    direction?: EnumDebtDirectionFieldUpdateOperationsInput | $Enums.DebtDirection
+    status?: EnumDebtStatusFieldUpdateOperationsInput | $Enums.DebtStatus
+    source?: EnumDebtSourceFieldUpdateOperationsInput | $Enums.DebtSource
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DebtUpsertWithWhereUniqueWithoutParentDebtInput = {
+    where: DebtWhereUniqueInput
+    update: XOR<DebtUpdateWithoutParentDebtInput, DebtUncheckedUpdateWithoutParentDebtInput>
+    create: XOR<DebtCreateWithoutParentDebtInput, DebtUncheckedCreateWithoutParentDebtInput>
+  }
+
+  export type DebtUpdateWithWhereUniqueWithoutParentDebtInput = {
+    where: DebtWhereUniqueInput
+    data: XOR<DebtUpdateWithoutParentDebtInput, DebtUncheckedUpdateWithoutParentDebtInput>
+  }
+
+  export type DebtUpdateManyWithWhereWithoutParentDebtInput = {
+    where: DebtScalarWhereInput
+    data: XOR<DebtUpdateManyMutationInput, DebtUncheckedUpdateManyWithoutParentDebtInput>
   }
 
   export type RelatedPersonUpsertWithoutDebtsInput = {
@@ -14701,6 +15062,7 @@ export namespace Prisma {
     userId: string
     billId?: string | null
     billItemId?: string | null
+    parentDebtId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
     category: string
@@ -14734,6 +15096,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     bill?: BillUpdateOneWithoutDebtsNestedInput
     billItem?: BillItemUpdateOneWithoutDebtNestedInput
+    parentDebt?: DebtUpdateOneWithoutChildDebtsNestedInput
+    childDebts?: DebtUpdateManyWithoutParentDebtNestedInput
   }
 
   export type DebtUncheckedUpdateWithoutPersonInput = {
@@ -14741,6 +15105,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     billId?: NullableStringFieldUpdateOperationsInput | string | null
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     category?: StringFieldUpdateOperationsInput | string
@@ -14754,6 +15119,7 @@ export namespace Prisma {
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childDebts?: DebtUncheckedUpdateManyWithoutParentDebtNestedInput
   }
 
   export type DebtUncheckedUpdateManyWithoutPersonInput = {
@@ -14761,6 +15127,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     billId?: NullableStringFieldUpdateOperationsInput | string | null
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     category?: StringFieldUpdateOperationsInput | string
@@ -14791,6 +15158,7 @@ export namespace Prisma {
     id?: string
     userId: string
     billItemId?: string | null
+    parentDebtId?: string | null
     personId?: string | null
     title: string
     amount: Decimal | DecimalJsLike | number | string
@@ -14859,6 +15227,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     billItem?: BillItemUpdateOneWithoutDebtNestedInput
+    parentDebt?: DebtUpdateOneWithoutChildDebtsNestedInput
+    childDebts?: DebtUpdateManyWithoutParentDebtNestedInput
     person?: RelatedPersonUpdateOneWithoutDebtsNestedInput
   }
 
@@ -14866,6 +15236,29 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
+    personId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    category?: StringFieldUpdateOperationsInput | string
+    type?: EnumBillItemTypeFieldUpdateOperationsInput | $Enums.BillItemType
+    recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
+    direction?: EnumDebtDirectionFieldUpdateOperationsInput | $Enums.DebtDirection
+    status?: EnumDebtStatusFieldUpdateOperationsInput | $Enums.DebtStatus
+    source?: EnumDebtSourceFieldUpdateOperationsInput | $Enums.DebtSource
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childDebts?: DebtUncheckedUpdateManyWithoutParentDebtNestedInput
+  }
+
+  export type DebtUncheckedUpdateManyWithoutBillInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentDebtId?: NullableStringFieldUpdateOperationsInput | string | null
     personId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -14882,9 +15275,75 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DebtUncheckedUpdateManyWithoutBillInput = {
+  export type DebtCreateManyParentDebtInput = {
+    id?: string
+    userId: string
+    billId?: string | null
+    billItemId?: string | null
+    personId?: string | null
+    title: string
+    amount: Decimal | DecimalJsLike | number | string
+    category: string
+    type?: $Enums.BillItemType
+    recurrence?: $Enums.Recurrence
+    direction?: $Enums.DebtDirection
+    status?: $Enums.DebtStatus
+    source?: $Enums.DebtSource
+    dueDate: Date | string
+    paidAt?: Date | string | null
+    notes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type DebtUpdateWithoutParentDebtInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    category?: StringFieldUpdateOperationsInput | string
+    type?: EnumBillItemTypeFieldUpdateOperationsInput | $Enums.BillItemType
+    recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
+    direction?: EnumDebtDirectionFieldUpdateOperationsInput | $Enums.DebtDirection
+    status?: EnumDebtStatusFieldUpdateOperationsInput | $Enums.DebtStatus
+    source?: EnumDebtSourceFieldUpdateOperationsInput | $Enums.DebtSource
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    bill?: BillUpdateOneWithoutDebtsNestedInput
+    billItem?: BillItemUpdateOneWithoutDebtNestedInput
+    childDebts?: DebtUpdateManyWithoutParentDebtNestedInput
+    person?: RelatedPersonUpdateOneWithoutDebtsNestedInput
+  }
+
+  export type DebtUncheckedUpdateWithoutParentDebtInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    billId?: NullableStringFieldUpdateOperationsInput | string | null
+    billItemId?: NullableStringFieldUpdateOperationsInput | string | null
+    personId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    category?: StringFieldUpdateOperationsInput | string
+    type?: EnumBillItemTypeFieldUpdateOperationsInput | $Enums.BillItemType
+    recurrence?: EnumRecurrenceFieldUpdateOperationsInput | $Enums.Recurrence
+    direction?: EnumDebtDirectionFieldUpdateOperationsInput | $Enums.DebtDirection
+    status?: EnumDebtStatusFieldUpdateOperationsInput | $Enums.DebtStatus
+    source?: EnumDebtSourceFieldUpdateOperationsInput | $Enums.DebtSource
+    dueDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    paidAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    childDebts?: DebtUncheckedUpdateManyWithoutParentDebtNestedInput
+  }
+
+  export type DebtUncheckedUpdateManyWithoutParentDebtInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    billId?: NullableStringFieldUpdateOperationsInput | string | null
     billItemId?: NullableStringFieldUpdateOperationsInput | string | null
     personId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
@@ -14919,6 +15378,10 @@ export namespace Prisma {
      * @deprecated Use BillCountOutputTypeDefaultArgs instead
      */
     export type BillCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = BillCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use DebtCountOutputTypeDefaultArgs instead
+     */
+    export type DebtCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = DebtCountOutputTypeDefaultArgs<ExtArgs>
     /**
      * @deprecated Use UserDefaultArgs instead
      */

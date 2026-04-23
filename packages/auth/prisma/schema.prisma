@@ -184,6 +184,7 @@ model Debt {
   userId      String
   billId      String?
   billItemId  String?      @unique
+  parentDebtId String?
   personId    String?
   title       String
   amount      Decimal      @db.Decimal(12, 2)
@@ -201,11 +202,14 @@ model Debt {
 
   bill     Bill?     @relation(fields: [billId], references: [id], onDelete: SetNull)
   billItem BillItem? @relation(fields: [billItemId], references: [id], onDelete: SetNull)
+  parentDebt Debt?   @relation("DebtChildren", fields: [parentDebtId], references: [id], onDelete: SetNull)
+  childDebts Debt[]  @relation("DebtChildren")
   person   RelatedPerson? @relation(fields: [personId], references: [id], onDelete: SetNull)
 
   @@index([userId, dueDate])
   @@index([userId, status])
   @@index([userId, direction])
+  @@index([parentDebtId])
   @@index([personId])
   @@map("debt")
 }
