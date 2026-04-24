@@ -31,7 +31,9 @@ export function KpiCard({
 	const mutedClass =
 		tone === "primary" ? "text-primary-foreground/70" : "text-muted-foreground";
 	return (
-		<div className={`rounded-[22px] border p-7 lg:p-8 ${toneStyles[tone]}`}>
+		<div
+			className={`rounded-[22px] border p-5 sm:p-7 lg:p-8 ${toneStyles[tone]}`}
+		>
 			<div className="flex items-start justify-between">
 				<span className={`text-base ${mutedClass}`}>{label}</span>
 				{delta ? <DeltaBadge delta={delta} tone={tone} /> : null}

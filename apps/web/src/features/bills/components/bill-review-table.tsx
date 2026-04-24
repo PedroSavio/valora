@@ -74,8 +74,8 @@ export function BillReviewTable({
 
 	return (
 		<div className="space-y-4">
-			<div className="flex flex-wrap items-end gap-3 rounded-[18px] border border-border bg-card p-4">
-				<p className="text-muted-foreground text-sm">
+			<div className="grid grid-cols-1 gap-3 rounded-[18px] border border-border bg-card p-4 sm:grid-cols-2 lg:flex lg:flex-wrap lg:items-end">
+				<p className="text-muted-foreground text-sm sm:col-span-2 lg:w-full">
 					Aplicar para todos os itens:
 				</p>
 				<label className="flex flex-col gap-1 text-muted-foreground text-xs">
@@ -98,7 +98,7 @@ export function BillReviewTable({
 							<select
 								value={applyPersonId}
 								onChange={(e) => setApplyPersonId(e.target.value)}
-								className="h-10 min-w-44 rounded-md border border-border bg-background px-3 text-foreground text-sm outline-none ring-primary/20 focus:ring-2"
+								className="h-10 w-full rounded-md border border-border bg-background px-3 text-foreground text-sm outline-none ring-primary/20 focus:ring-2 lg:min-w-44"
 							>
 								<option value="">Selecionar</option>
 								{relatedPeople.map((p) => (
@@ -114,7 +114,7 @@ export function BillReviewTable({
 								value={applyPersonName}
 								onChange={(e) => setApplyPersonName(e.target.value)}
 								placeholder="Nome da pessoa"
-								className="h-10 min-w-48 rounded-md border border-border bg-background px-3 text-foreground text-sm outline-none ring-primary/20 focus:ring-2"
+								className="h-10 w-full rounded-md border border-border bg-background px-3 text-foreground text-sm outline-none ring-primary/20 focus:ring-2 lg:min-w-48"
 							/>
 						</label>
 					</>
@@ -122,13 +122,13 @@ export function BillReviewTable({
 				<button
 					type="button"
 					onClick={applyToAll}
-					className="h-10 rounded-md border border-border px-4 font-medium text-sm hover:bg-card/70"
+					className="h-10 rounded-md border border-border px-4 font-medium text-sm hover:bg-card/70 sm:col-span-2 lg:col-span-1"
 				>
 					Aplicar para todos
 				</button>
 			</div>
-			<div className="overflow-hidden rounded-[18px] border border-border bg-card">
-				<table className="w-full text-sm">
+			<div className="overflow-x-auto rounded-[18px] border border-border bg-card">
+				<table className="w-full min-w-[820px] text-sm">
 					<thead className="border-border border-b bg-black/20 text-muted-foreground text-xs uppercase tracking-wide">
 						<tr>
 							<th className="px-3 py-3 text-left">Dívida</th>

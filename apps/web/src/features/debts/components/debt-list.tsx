@@ -49,19 +49,21 @@ export function DebtList({ debts }: { debts: Debt[] }) {
 			{debts.map((debt) => (
 				<li
 					key={debt.id}
-					className="flex items-center justify-between rounded-[18px] border border-border bg-card p-4"
+					className="flex flex-col gap-3 rounded-[18px] border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
 				>
-					<div className="flex items-center gap-3">
-						<span className="flex size-10 items-center justify-center rounded-full bg-black/30 text-muted-foreground">
+					<div className="flex min-w-0 items-center gap-3">
+						<span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-black/30 text-muted-foreground">
 							{debt.source === "BILL" ? (
 								<Sparkles className="size-4" />
 							) : (
 								<Receipt className="size-4" />
 							)}
 						</span>
-						<div>
-							<p className="font-medium text-foreground">{debt.title}</p>
-							<p className="flex items-center gap-2 text-muted-foreground text-xs">
+						<div className="min-w-0">
+							<p className="truncate font-medium text-foreground">
+								{debt.title}
+							</p>
+							<p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs">
 								<Calendar className="size-3" />
 								{formatShortDate(debt.dueDate)} ·{" "}
 								{directionLabel(debt.direction)}
@@ -74,33 +76,35 @@ export function DebtList({ debts }: { debts: Debt[] }) {
 							</p>
 						</div>
 					</div>
-					<div className="flex items-center gap-3">
+					<div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end sm:gap-3">
 						<span className="font-semibold text-sm">
 							{formatBRL(debt.amount)}
 						</span>
-						<form action={settleDebt.bind(null, debt.id)}>
-							<button
-								type="submit"
+						<div className="flex flex-wrap items-center gap-2">
+							<form action={settleDebt.bind(null, debt.id)}>
+								<button
+									type="submit"
+									className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
+								>
+									{debt.status === "PAID" ? "Reabrir" : "Dar baixa"}
+								</button>
+							</form>
+							<Link
+								href={`/debts/${debt.id}/edit`}
 								className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
 							>
-								{debt.status === "PAID" ? "Reabrir" : "Dar baixa"}
-							</button>
-						</form>
-						<Link
-							href={`/debts/${debt.id}/edit`}
-							className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
-						>
-							Editar
-						</Link>
-						<form action={deleteDebt.bind(null, debt.id)}>
-							<button
-								type="submit"
-								className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-destructive text-xs hover:bg-destructive/10"
-							>
-								<Trash2 className="size-3.5" />
-								Excluir
-							</button>
-						</form>
+								Editar
+							</Link>
+							<form action={deleteDebt.bind(null, debt.id)}>
+								<button
+									type="submit"
+									className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-destructive text-xs hover:bg-destructive/10"
+								>
+									<Trash2 className="size-3.5" />
+									Excluir
+								</button>
+							</form>
+						</div>
 					</div>
 				</li>
 			))}

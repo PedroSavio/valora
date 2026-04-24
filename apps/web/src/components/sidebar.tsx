@@ -23,7 +23,7 @@ type NavItem = {
 	badge?: string;
 };
 
-const primaryNav: NavItem[] = [
+const PRIMARY_NAV: NavItem[] = [
 	{ href: "/dashboard", label: "Visão geral", icon: BarChart3 },
 	{ href: "/incomes", label: "Entradas", icon: TrendingUp },
 	{ href: "/debts", label: "Dívidas", icon: Receipt },
@@ -31,6 +31,11 @@ const primaryNav: NavItem[] = [
 	{ href: "/profile", label: "Perfil", icon: User },
 	{ href: "/settings", label: "Configurações", icon: Settings },
 ];
+
+function isActive(pathname: string, href: string) {
+	if (href === "/dashboard") return pathname === "/dashboard";
+	return pathname.startsWith(href);
+}
 
 export function Sidebar() {
 	const pathname = usePathname();
@@ -43,35 +48,31 @@ export function Sidebar() {
 	}
 
 	return (
-		<aside className="flex h-svh w-[85px] flex-col items-center justify-between border-[#222] border-r bg-black py-6">
-			<div className="flex flex-col items-center gap-8">
-				<Link
-					href="/dashboard"
-					aria-label="valora"
-					className="flex size-[53px] items-center justify-center overflow-hidden rounded-full bg-[#17191C]"
-				>
-					<Image src="/logo.svg" alt="valora" width={32} height={32} priority />
-				</Link>
-				<nav className="flex flex-col items-center gap-3">
-					{primaryNav.map((item) => (
-						<SideLink
-							key={item.href}
-							item={item}
-							active={isActive(pathname, item.href)}
-						/>
-					))}
-				</nav>
-			</div>
-			<div className="flex flex-col items-center gap-3">
-				<IconButton label="Sair" icon={LogOut} onClick={handleLogout} />
-			</div>
+		<aside
+			className="flex shrink-0 items-center justify-between border-[#222] bg-black max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:z-40 max-lg:h-16 max-lg:border-t max-lg:px-3 lg:h-svh lg:w-[85px] lg:flex-col lg:border-r lg:py-6"
+			aria-label="Navegação principal"
+		>
+			<Link
+				href="/dashboard"
+				aria-label="valora"
+				className="hidden size-[53px] items-center justify-center overflow-hidden rounded-full bg-[#17191C] lg:flex"
+			>
+				<Image src="/logo.svg" alt="valora" width={32} height={32} priority />
+			</Link>
+
+			<nav className="flex flex-1 items-center justify-around gap-2 lg:flex-col lg:justify-center lg:gap-3">
+				{PRIMARY_NAV.map((item) => (
+					<SideLink
+						key={item.href}
+						item={item}
+						active={isActive(pathname, item.href)}
+					/>
+				))}
+			</nav>
+
+			<IconButton label="Sair" icon={LogOut} onClick={handleLogout} />
 		</aside>
 	);
-}
-
-function isActive(pathname: string, href: string) {
-	if (href === "/dashboard") return pathname === "/dashboard";
-	return pathname.startsWith(href);
 }
 
 function SideLink({ item, active }: { item: NavItem; active: boolean }) {
@@ -111,7 +112,7 @@ function IconButton({
 			type="button"
 			aria-label={label}
 			onClick={onClick}
-			className="flex size-11 items-center justify-center rounded-xl text-[#868686] transition-colors hover:bg-[#17191C] hover:text-foreground"
+			className="flex size-11 shrink-0 items-center justify-center rounded-xl text-[#868686] transition-colors hover:bg-[#17191C] hover:text-foreground"
 		>
 			<Icon className="size-5" />
 		</button>

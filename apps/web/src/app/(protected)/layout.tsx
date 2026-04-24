@@ -9,9 +9,9 @@ export default async function ProtectedLayout({
 	await requireSession();
 
 	return (
-		<div className="dark flex h-svh bg-background text-foreground">
+		<div className="dark flex min-h-svh flex-col bg-background text-foreground lg:h-svh lg:flex-row">
 			<Sidebar />
-			<main className="flex-1 overflow-y-auto">{children}</main>
+			<main className="flex-1 overflow-y-auto pb-20 lg:pb-0">{children}</main>
 		</div>
 	);
 }

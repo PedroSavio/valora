@@ -38,7 +38,7 @@ export default async function DebtsPage({
 	const receivables = debts.filter((d) => d.direction === "RECEIVABLE").length;
 
 	return (
-		<div className="mx-auto w-full max-w-[1100px] space-y-6 p-6 lg:p-10">
+		<div className="mx-auto w-full max-w-[1100px] space-y-6 p-4 sm:p-6 lg:p-10">
 			<header className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h1 className="font-semibold text-2xl tracking-tight">Dívidas</h1>

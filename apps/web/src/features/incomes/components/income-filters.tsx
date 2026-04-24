@@ -11,14 +11,17 @@ export function IncomeFilters({ fromDate, toDate, selectedType }: Props) {
 		"h-10 rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:ring-2 ring-primary/20";
 
 	return (
-		<form method="get" className="flex flex-wrap items-end gap-3">
+		<form
+			method="get"
+			className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end"
+		>
 			<label className="flex flex-col gap-1 text-muted-foreground text-xs">
 				De
 				<input
 					type="date"
 					name="fromDate"
 					defaultValue={fromDate}
-					className={`${selectCls} min-w-40`}
+					className={`${selectCls} w-full sm:min-w-40`}
 				/>
 			</label>
 			<label className="flex flex-col gap-1 text-muted-foreground text-xs">
@@ -27,15 +30,15 @@ export function IncomeFilters({ fromDate, toDate, selectedType }: Props) {
 					type="date"
 					name="toDate"
 					defaultValue={toDate}
-					className={`${selectCls} min-w-40`}
+					className={`${selectCls} w-full sm:min-w-40`}
 				/>
 			</label>
-			<label className="flex flex-col gap-1 text-muted-foreground text-xs">
+			<label className="col-span-2 flex flex-col gap-1 text-muted-foreground text-xs sm:col-span-1">
 				Tipo
 				<select
 					name="type"
 					defaultValue={selectedType ?? ""}
-					className={`${selectCls} min-w-28`}
+					className={`${selectCls} w-full sm:min-w-28`}
 				>
 					<option value="">Todos</option>
 					<option value="CLT">CLT</option>
@@ -44,7 +47,7 @@ export function IncomeFilters({ fromDate, toDate, selectedType }: Props) {
 			</label>
 			<button
 				type="submit"
-				className="h-10 rounded-md bg-primary px-4 font-medium text-primary-foreground text-sm hover:opacity-90"
+				className="col-span-2 h-10 rounded-md bg-primary px-4 font-medium text-primary-foreground text-sm hover:opacity-90 sm:col-span-1"
 			>
 				Aplicar
 			</button>

@@ -170,7 +170,7 @@ export default async function DashboardPage({
 	];
 
 	return (
-		<div className="mx-auto w-full max-w-[1440px] space-y-6 p-6 lg:p-10">
+		<div className="mx-auto w-full max-w-[1440px] space-y-6 p-4 sm:p-6 lg:p-10">
 			<DashboardHeader
 				userName={data.userName}
 				selectedMonth={selectedDate.getMonth() + 1}

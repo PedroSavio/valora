@@ -48,7 +48,7 @@ export default async function IncomesPage({
 	});
 
 	return (
-		<div className="mx-auto w-full max-w-[1100px] space-y-6 p-6 lg:p-10">
+		<div className="mx-auto w-full max-w-[1100px] space-y-6 p-4 sm:p-6 lg:p-10">
 			<header className="flex flex-wrap items-end justify-between gap-4">
 				<div>
 					<h1 className="font-semibold text-2xl tracking-tight">Entradas</h1>

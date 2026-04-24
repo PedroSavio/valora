@@ -53,12 +53,12 @@ export function IncomeList({ incomes }: { incomes: Income[] }) {
 				{incomes.map((income) => (
 					<li
 						key={income.id}
-						className="flex items-center justify-between rounded-[18px] border border-border bg-card p-4"
+						className="flex flex-col gap-3 rounded-[18px] border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
 					>
-						<div className="flex items-center gap-3">
+						<div className="flex min-w-0 items-center gap-3">
 							<TypeBadge type={income.type} />
-							<div>
-								<p className="font-medium text-foreground">
+							<div className="min-w-0">
+								<p className="truncate font-medium text-foreground">
 									{TYPE_LABELS[income.type]}
 									{income.description ? ` · ${income.description}` : ""}
 								</p>
@@ -67,25 +67,27 @@ export function IncomeList({ incomes }: { incomes: Income[] }) {
 								</p>
 							</div>
 						</div>
-						<div className="flex items-center gap-3">
+						<div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end sm:gap-3">
 							<span className="font-semibold text-primary text-sm">
 								{formatBRL(income.amount)}
 							</span>
-							<Link
-								href={`/incomes/${income.id}/edit`}
-								className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
-							>
-								Editar
-							</Link>
-							<form action={deleteIncome.bind(null, income.id)}>
-								<button
-									type="submit"
-									className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-destructive text-xs hover:bg-destructive/10"
+							<div className="flex flex-wrap items-center gap-2">
+								<Link
+									href={`/incomes/${income.id}/edit`}
+									className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
 								>
-									<Trash2 className="size-3.5" />
-									Excluir
-								</button>
-							</form>
+									Editar
+								</Link>
+								<form action={deleteIncome.bind(null, income.id)}>
+									<button
+										type="submit"
+										className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-destructive text-xs hover:bg-destructive/10"
+									>
+										<Trash2 className="size-3.5" />
+										Excluir
+									</button>
+								</form>
+							</div>
 						</div>
 					</li>
 				))}

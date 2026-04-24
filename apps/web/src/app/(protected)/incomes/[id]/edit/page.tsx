@@ -18,7 +18,7 @@ export default async function EditIncomePage({
 	if (!income) notFound();
 
 	return (
-		<div className="mx-auto w-full max-w-2xl space-y-6 p-6 lg:p-10">
+		<div className="mx-auto w-full max-w-2xl space-y-6 p-4 sm:p-6 lg:p-10">
 			<header>
 				<h1 className="font-semibold text-2xl tracking-tight">
 					Editar entrada
