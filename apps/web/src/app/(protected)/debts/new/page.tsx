@@ -1,14 +1,9 @@
-import { auth } from "@valora/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 import { DebtForm } from "@/features/debts/components/debt-form";
 import { listRelatedPeople } from "@/features/debts/data/related-people.repo";
+import { requireSession } from "@/lib/session";
 
 export default async function NewDebtPage() {
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
-
+	const session = await requireSession();
 	const relatedPeople = await listRelatedPeople(session.user.id);
 
 	return (

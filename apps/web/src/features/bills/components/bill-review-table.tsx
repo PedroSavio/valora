@@ -3,22 +3,11 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { EXPENSE_CATEGORIES } from "@/lib/categories";
 import { formatBRL } from "@/lib/format";
 
 import { confirmBill } from "../actions/confirm-bill";
 import type { BillItemReview } from "../schemas";
-
-const CATEGORIES = [
-	"Alimentação",
-	"Transporte",
-	"Serviços",
-	"Moradia",
-	"Saúde",
-	"Lazer",
-	"Educação",
-	"Cartão",
-	"Outros",
-];
 
 type Props = {
 	billId: string;
@@ -34,7 +23,10 @@ export function BillReviewTable({
 	relatedPeople,
 }: Props) {
 	const [items, setItems] = useState<BillItemReview[]>(
-		initialItems.map((i) => ({ ...i, dueDate: i.dueDate || defaultDueDate })),
+		initialItems.map((item) => ({
+			...item,
+			dueDate: item.dueDate || defaultDueDate,
+		})),
 	);
 	const [applyDirection, setApplyDirection] =
 		useState<BillItemReview["direction"]>("PAYABLE");
@@ -42,20 +34,43 @@ export function BillReviewTable({
 	const [applyPersonName, setApplyPersonName] = useState("");
 	const [isPending, startTransition] = useTransition();
 
-	function update<K extends keyof BillItemReview>(
+	function updateItem<K extends keyof BillItemReview>(
 		id: string,
 		key: K,
 		value: BillItemReview[K],
 	) {
 		setItems((curr) =>
-			curr.map((i) => (i.id === id ? { ...i, [key]: value } : i)),
+			curr.map((item) => (item.id === id ? { ...item, [key]: value } : item)),
 		);
 	}
 
-	const selectedCount = items.filter((i) => i.selected).length;
-	const selectedTotal = items
-		.filter((i) => i.selected)
-		.reduce((s, i) => s + Number(i.amount), 0);
+	function applyToAll() {
+		setItems((curr) =>
+			curr.map((item) => ({
+				...item,
+				direction: applyDirection,
+				personId: applyDirection === "RECEIVABLE" ? applyPersonId : "",
+				personName: applyDirection === "RECEIVABLE" ? applyPersonName : "",
+			})),
+		);
+	}
+
+	function submit() {
+		startTransition(async () => {
+			try {
+				await confirmBill({ billId, items });
+			} catch (err) {
+				toast.error(err instanceof Error ? err.message : "Falha ao confirmar");
+			}
+		});
+	}
+
+	const selectedItems = items.filter((item) => item.selected);
+	const selectedCount = selectedItems.length;
+	const selectedTotal = selectedItems.reduce(
+		(sum, item) => sum + Number(item.amount),
+		0,
+	);
 
 	return (
 		<div className="space-y-4">
@@ -106,17 +121,7 @@ export function BillReviewTable({
 				) : null}
 				<button
 					type="button"
-					onClick={() =>
-						setItems((curr) =>
-							curr.map((i) => ({
-								...i,
-								direction: applyDirection,
-								personId: applyDirection === "RECEIVABLE" ? applyPersonId : "",
-								personName:
-									applyDirection === "RECEIVABLE" ? applyPersonName : "",
-							})),
-						)
-					}
+					onClick={applyToAll}
 					className="h-10 rounded-md border border-border px-4 font-medium text-sm hover:bg-card/70"
 				>
 					Aplicar para todos
@@ -145,7 +150,7 @@ export function BillReviewTable({
 										type="checkbox"
 										checked={item.selected}
 										onChange={(e) =>
-											update(item.id, "selected", e.target.checked)
+											updateItem(item.id, "selected", e.target.checked)
 										}
 										className="size-4 accent-primary"
 									/>
@@ -154,7 +159,7 @@ export function BillReviewTable({
 									<input
 										value={item.description}
 										onChange={(e) =>
-											update(item.id, "description", e.target.value)
+											updateItem(item.id, "description", e.target.value)
 										}
 										className="w-full rounded-md bg-transparent px-2 py-1 text-sm outline-none hover:bg-black/20 focus:bg-black/30"
 									/>
@@ -165,7 +170,7 @@ export function BillReviewTable({
 										step="0.01"
 										value={item.amount}
 										onChange={(e) =>
-											update(item.id, "amount", Number(e.target.value))
+											updateItem(item.id, "amount", Number(e.target.value))
 										}
 										className="w-28 rounded-md bg-transparent px-2 py-1 text-right text-sm outline-none hover:bg-black/20 focus:bg-black/30"
 									/>
@@ -173,16 +178,18 @@ export function BillReviewTable({
 								<td className="px-3 py-2">
 									<select
 										value={
-											CATEGORIES.includes(item.category)
+											EXPENSE_CATEGORIES.includes(
+												item.category as (typeof EXPENSE_CATEGORIES)[number],
+											)
 												? item.category
 												: "Outros"
 										}
 										onChange={(e) =>
-											update(item.id, "category", e.target.value)
+											updateItem(item.id, "category", e.target.value)
 										}
 										className="rounded-md bg-transparent px-2 py-1 text-sm outline-none hover:bg-black/20"
 									>
-										{CATEGORIES.map((c) => (
+										{EXPENSE_CATEGORIES.map((c) => (
 											<option key={c} value={c} className="bg-card">
 												{c}
 											</option>
@@ -193,7 +200,7 @@ export function BillReviewTable({
 									<select
 										value={item.type}
 										onChange={(e) =>
-											update(
+											updateItem(
 												item.id,
 												"type",
 												e.target.value as BillItemReview["type"],
@@ -213,7 +220,7 @@ export function BillReviewTable({
 									<select
 										value={item.recurrence}
 										onChange={(e) =>
-											update(
+											updateItem(
 												item.id,
 												"recurrence",
 												e.target.value as BillItemReview["recurrence"],
@@ -239,7 +246,7 @@ export function BillReviewTable({
 									<select
 										value={item.direction}
 										onChange={(e) =>
-											update(
+											updateItem(
 												item.id,
 												"direction",
 												e.target.value as BillItemReview["direction"],
@@ -261,7 +268,7 @@ export function BillReviewTable({
 											<select
 												value={item.personId ?? ""}
 												onChange={(e) =>
-													update(item.id, "personId", e.target.value)
+													updateItem(item.id, "personId", e.target.value)
 												}
 												className="rounded-md bg-transparent px-2 py-1 text-sm outline-none hover:bg-black/20"
 											>
@@ -277,7 +284,7 @@ export function BillReviewTable({
 											<input
 												value={item.personName ?? ""}
 												onChange={(e) =>
-													update(item.id, "personName", e.target.value)
+													updateItem(item.id, "personName", e.target.value)
 												}
 												placeholder="Ou digite o nome"
 												className="rounded-md bg-transparent px-2 py-1 text-sm outline-none hover:bg-black/20 focus:bg-black/30"
@@ -291,7 +298,9 @@ export function BillReviewTable({
 									<input
 										type="date"
 										value={item.dueDate.slice(0, 10)}
-										onChange={(e) => update(item.id, "dueDate", e.target.value)}
+										onChange={(e) =>
+											updateItem(item.id, "dueDate", e.target.value)
+										}
 										className="rounded-md bg-transparent px-2 py-1 text-sm outline-none hover:bg-black/20"
 									/>
 								</td>
@@ -311,17 +320,7 @@ export function BillReviewTable({
 				<button
 					type="button"
 					disabled={isPending || selectedCount === 0}
-					onClick={() =>
-						startTransition(async () => {
-							try {
-								await confirmBill({ billId, items });
-							} catch (err) {
-								toast.error(
-									err instanceof Error ? err.message : "Falha ao confirmar",
-								);
-							}
-						})
-					}
+					onClick={submit}
 					className="rounded-[18px] bg-primary px-6 py-3 font-semibold text-primary-foreground text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60"
 				>
 					{isPending ? "Confirmando..." : "Confirmar e criar dívidas"}

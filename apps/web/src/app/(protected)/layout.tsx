@@ -1,21 +1,12 @@
-import { auth } from "@valora/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
 import { Sidebar } from "@/components/sidebar";
+import { requireSession } from "@/lib/session";
 
 export default async function ProtectedLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	});
-
-	if (!session?.user) {
-		redirect("/login");
-	}
+	await requireSession();
 
 	return (
 		<div className="dark flex h-svh bg-background text-foreground">

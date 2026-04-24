@@ -1,9 +1,10 @@
-import { auth } from "@valora/auth";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { IncomeForm } from "@/features/incomes/components/income-form";
 import { getIncomeById } from "@/features/incomes/data/incomes.repo";
+import { requireSession } from "@/lib/session";
+
+const DEFAULT_PJ_TAX_RATE = 6;
 
 export default async function EditIncomePage({
 	params,
@@ -11,9 +12,7 @@ export default async function EditIncomePage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
+	const session = await requireSession();
 
 	const income = await getIncomeById(session.user.id, id);
 	if (!income) notFound();
@@ -34,7 +33,10 @@ export default async function EditIncomePage({
 				initialValues={{
 					type: income.type,
 					amount: income.amount,
-					taxRate: income.type === "PJ" ? income.taxRate || 6 : 6,
+					taxRate:
+						income.type === "PJ"
+							? income.taxRate || DEFAULT_PJ_TAX_RATE
+							: DEFAULT_PJ_TAX_RATE,
 					date: income.date,
 					description: income.description,
 				}}

@@ -1,11 +1,11 @@
-import { auth } from "@valora/auth";
 import { prisma } from "@valora/auth/prisma";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { BillReviewTable } from "@/features/bills/components/bill-review-table";
 import type { BillItemReview } from "@/features/bills/schemas";
 import { listRelatedPeople } from "@/features/debts/data/related-people.repo";
+import { toISODate } from "@/lib/date";
+import { requireSession } from "@/lib/session";
 
 export default async function BillReviewPage({
 	params,
@@ -13,9 +13,7 @@ export default async function BillReviewPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
+	const session = await requireSession();
 
 	const [bill, relatedPeople] = await Promise.all([
 		prisma.bill.findFirst({
@@ -26,18 +24,16 @@ export default async function BillReviewPage({
 	]);
 	if (!bill) notFound();
 
-	const defaultDueDate = (bill.issuedAt ?? new Date())
-		.toISOString()
-		.slice(0, 10);
+	const defaultDueDate = toISODate(bill.issuedAt ?? new Date());
 
-	const initialItems: BillItemReview[] = bill.items.map((i) => ({
-		id: i.id,
-		description: i.description,
-		amount: Number(i.amount),
-		category: i.category,
-		type: i.type,
-		recurrence: i.recurrence,
-		selected: i.selected,
+	const initialItems: BillItemReview[] = bill.items.map((item) => ({
+		id: item.id,
+		description: item.description,
+		amount: Number(item.amount),
+		category: item.category,
+		type: item.type,
+		recurrence: item.recurrence,
+		selected: item.selected,
 		direction: "PAYABLE",
 		personId: "",
 		personName: "",

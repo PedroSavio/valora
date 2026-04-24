@@ -1,26 +1,32 @@
 import { prisma } from "@valora/auth/prisma";
+
+import { rangeFromISODates } from "@/lib/date";
+
 import type { DebtFilters } from "../schemas";
 
-export async function listDebts(userId: string, filters: DebtFilters = {}) {
-	const where: {
-		userId: string;
-		parentDebtId?: null;
-		dueDate?: { gte: Date; lte: Date };
-	} = { userId };
-	where.parentDebtId = null;
+type DebtWhere = {
+	userId: string;
+	parentDebtId: null;
+	dueDate?: { gte: Date; lte: Date };
+};
+
+function buildDebtWhere(userId: string, filters: DebtFilters): DebtWhere {
+	const where: DebtWhere = { userId, parentDebtId: null };
 
 	if (filters.fromDate && filters.toDate) {
-		where.dueDate = {
-			gte: new Date(`${filters.fromDate}T00:00:00`),
-			lte: new Date(`${filters.toDate}T23:59:59.999`),
-		};
+		where.dueDate = rangeFromISODates(filters.fromDate, filters.toDate);
 	}
 
+	return where;
+}
+
+export async function listDebts(userId: string, filters: DebtFilters = {}) {
 	const debts = await prisma.debt.findMany({
-		where,
+		where: buildDebtWhere(userId, filters),
 		orderBy: [{ status: "asc" }, { dueDate: "asc" }],
 		include: { person: true, childDebts: { select: { id: true } } },
 	});
+
 	return debts.map((d) => ({
 		...d,
 		amount: Number(d.amount),
@@ -68,30 +74,27 @@ export async function listUpcomingDebts(userId: string, limit = 5) {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	let debts = await prisma.debt.findMany({
-		where: {
-			userId,
-			parentDebtId: null,
-			status: "OPEN",
-			direction: "PAYABLE",
-			dueDate: { gte: today },
-		},
+	const baseWhere = {
+		userId,
+		parentDebtId: null,
+		status: "OPEN" as const,
+		direction: "PAYABLE" as const,
+	};
+
+	const upcoming = await prisma.debt.findMany({
+		where: { ...baseWhere, dueDate: { gte: today } },
 		orderBy: { dueDate: "asc" },
 		take: limit,
 	});
 
-	if (debts.length === 0) {
-		debts = await prisma.debt.findMany({
-			where: {
-				userId,
-				parentDebtId: null,
-				status: "OPEN",
-				direction: "PAYABLE",
-			},
-			orderBy: { dueDate: "asc" },
-			take: limit,
-		});
-	}
+	const debts =
+		upcoming.length > 0
+			? upcoming
+			: await prisma.debt.findMany({
+					where: baseWhere,
+					orderBy: { dueDate: "asc" },
+					take: limit,
+				});
 
 	return debts.map((d) => ({
 		id: d.id,

@@ -6,31 +6,30 @@ import {
 	sumIncomeInRange,
 	sumTaxDueInRange,
 } from "@/features/incomes/data/incomes.repo";
+import { endOfMonth, previousMonth, startOfMonth } from "@/lib/date";
 
-import type { DailyFlow, DashboardData, KpiDelta } from "../types";
+import type { DailyFlow, DashboardData, KpiDelta, OwingPerson } from "../types";
 
 const FLAT_DELTA: KpiDelta = { direction: "flat", percent: 0 };
+const MAX_OWING_PEOPLE = 8;
+const UPCOMING_BILLS_LIMIT = 5;
 
-function startOfMonth(d: Date) {
-	return new Date(d.getFullYear(), d.getMonth(), 1);
-}
-function endOfMonth(d: Date) {
-	return new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
-}
-function previousMonth(d: Date) {
-	return new Date(d.getFullYear(), d.getMonth() - 1, 1);
-}
+type ReceivableRow = {
+	personId: string | null;
+	amount: { toString(): string } | number;
+	person: { name: string | null } | null;
+};
 
-function emptyDailyFlow(d: Date): DailyFlow[] {
-	const end = endOfMonth(d);
-	return Array.from({ length: end.getDate() }, (_, i) => ({
+function emptyDailyFlow(date: Date): DailyFlow[] {
+	const lastDay = endOfMonth(date).getDate();
+	return Array.from({ length: lastDay }, (_, i) => ({
 		day: i + 1,
 		income: 0,
 		expense: 0,
 	}));
 }
 
-function delta(current: number, previous: number): KpiDelta {
+function calculateDelta(current: number, previous: number): KpiDelta {
 	if (previous === 0) {
 		if (current === 0) return FLAT_DELTA;
 		return { direction: "up", percent: 100 };
@@ -43,6 +42,34 @@ function delta(current: number, previous: number): KpiDelta {
 	};
 }
 
+function aggregateOwingPeople(rows: ReceivableRow[]): OwingPerson[] {
+	const byKey = new Map<string, OwingPerson>();
+
+	for (const row of rows) {
+		const rawName = row.person?.name?.trim() || "Sem pessoa vinculada";
+		const key = rawName.toLocaleLowerCase("pt-BR");
+		const amount = Number(row.amount);
+		const current = byKey.get(key);
+
+		if (current) {
+			current.amount += amount;
+			current.debtCount += 1;
+			if (!current.personId && row.personId) current.personId = row.personId;
+		} else {
+			byKey.set(key, {
+				personId: row.personId,
+				name: rawName,
+				amount,
+				debtCount: 1,
+			});
+		}
+	}
+
+	return Array.from(byKey.values())
+		.sort((a, b) => b.amount - a.amount)
+		.slice(0, MAX_OWING_PEOPLE);
+}
+
 export async function getDashboardData(
 	userId: string,
 	userName: string,
@@ -53,6 +80,10 @@ export async function getDashboardData(
 	const prevRef = previousMonth(periodDate);
 	const prevStart = startOfMonth(prevRef);
 	const prevEnd = endOfMonth(prevRef);
+
+	const monthRange = { gte: monthStart, lte: monthEnd };
+	const prevMonthRange = { gte: prevStart, lte: prevEnd };
+	const baseDebtFilter = { userId, parentDebtId: null } as const;
 
 	const [
 		openAgg,
@@ -71,38 +102,22 @@ export async function getDashboardData(
 	] = await Promise.all([
 		prisma.debt.aggregate({
 			_sum: { amount: true },
-			where: {
-				userId,
-				parentDebtId: null,
-				status: "OPEN",
-				direction: "PAYABLE",
-			},
+			where: { ...baseDebtFilter, status: "OPEN", direction: "PAYABLE" },
+		}),
+		prisma.debt.aggregate({
+			_sum: { amount: true },
+			where: { ...baseDebtFilter, direction: "PAYABLE", dueDate: monthRange },
 		}),
 		prisma.debt.aggregate({
 			_sum: { amount: true },
 			where: {
-				userId,
-				parentDebtId: null,
+				...baseDebtFilter,
 				direction: "PAYABLE",
-				dueDate: { gte: monthStart, lte: monthEnd },
-			},
-		}),
-		prisma.debt.aggregate({
-			_sum: { amount: true },
-			where: {
-				userId,
-				parentDebtId: null,
-				direction: "PAYABLE",
-				dueDate: { gte: prevStart, lte: prevEnd },
+				dueDate: prevMonthRange,
 			},
 		}),
 		prisma.debt.findMany({
-			where: {
-				userId,
-				parentDebtId: null,
-				direction: "PAYABLE",
-				dueDate: { gte: monthStart, lte: monthEnd },
-			},
+			where: { ...baseDebtFilter, direction: "PAYABLE", dueDate: monthRange },
 			select: { amount: true, dueDate: true },
 		}),
 		sumIncomeInRange(userId, monthStart, monthEnd),
@@ -111,47 +126,28 @@ export async function getDashboardData(
 		prisma.income.aggregate({ _sum: { amount: true }, where: { userId } }),
 		prisma.debt.aggregate({
 			_sum: { amount: true },
-			where: {
-				userId,
-				parentDebtId: null,
-				status: "PAID",
-				direction: "PAYABLE",
-			},
+			where: { ...baseDebtFilter, status: "PAID", direction: "PAYABLE" },
 		}),
 		prisma.debt.aggregate({
 			_sum: { amount: true },
-			where: {
-				userId,
-				parentDebtId: null,
-				status: "OPEN",
-				direction: "RECEIVABLE",
-			},
+			where: { ...baseDebtFilter, status: "OPEN", direction: "RECEIVABLE" },
 		}),
 		prisma.debt.findMany({
-			where: {
-				userId,
-				parentDebtId: null,
-				status: "OPEN",
-				direction: "RECEIVABLE",
-			},
+			where: { ...baseDebtFilter, status: "OPEN", direction: "RECEIVABLE" },
 			select: {
 				personId: true,
 				amount: true,
-				person: {
-					select: {
-						name: true,
-					},
-				},
+				person: { select: { name: true } },
 			},
 		}),
-		listUpcomingDebts(userId, 5),
+		listUpcomingDebts(userId, UPCOMING_BILLS_LIMIT),
 		sumTaxDueInRange(userId, prevStart, prevEnd),
 	]);
 
 	const dailyFlow = emptyDailyFlow(periodDate);
-	for (const d of monthDebts) {
-		const idx = d.dueDate.getDate() - 1;
-		if (dailyFlow[idx]) dailyFlow[idx].expense += Number(d.amount);
+	for (const debt of monthDebts) {
+		const idx = debt.dueDate.getDate() - 1;
+		if (dailyFlow[idx]) dailyFlow[idx].expense += Number(debt.amount);
 	}
 	for (const [day, amount] of incomeByDay) {
 		const idx = day - 1;
@@ -165,37 +161,11 @@ export async function getDashboardData(
 	const balance =
 		Number(allTimeIncome._sum.amount ?? 0) -
 		Number(paidDebtsAgg._sum.amount ?? 0);
-	const projectedBalance = balance + totalReceivable;
-
-	const aggregatedByName = new Map<
-		string,
-		{ personId: string | null; name: string; amount: number; debtCount: number }
-	>();
-	for (const row of receivablesRows) {
-		const rawName = row.person?.name?.trim() || "Sem pessoa vinculada";
-		const key = rawName.toLocaleLowerCase("pt-BR");
-		const current = aggregatedByName.get(key);
-		if (current) {
-			current.amount += Number(row.amount);
-			current.debtCount += 1;
-			if (!current.personId && row.personId) current.personId = row.personId;
-		} else {
-			aggregatedByName.set(key, {
-				personId: row.personId,
-				name: rawName,
-				amount: Number(row.amount),
-				debtCount: 1,
-			});
-		}
-	}
-	const owingPeople = Array.from(aggregatedByName.values())
-		.sort((a, b) => b.amount - a.amount)
-		.slice(0, 8);
 
 	return {
 		userName,
 		balance,
-		projectedBalance,
+		projectedBalance: balance + totalReceivable,
 		totalDebt,
 		totalReceivable,
 		monthExpense,
@@ -204,8 +174,8 @@ export async function getDashboardData(
 		deltas: {
 			balance: FLAT_DELTA,
 			debt: FLAT_DELTA,
-			expense: delta(monthExpense, prevMonthExpense),
-			income: delta(monthIncome, prevMonthIncome),
+			expense: calculateDelta(monthExpense, prevMonthExpense),
+			income: calculateDelta(monthIncome, prevMonthIncome),
 		},
 		upcomingBills: upcoming.map((d) => ({
 			id: d.id,
@@ -214,7 +184,7 @@ export async function getDashboardData(
 			dueDate: d.dueDate,
 			category: d.category,
 		})),
-		owingPeople,
+		owingPeople: aggregateOwingPeople(receivablesRows),
 		dailyFlow,
 	};
 }

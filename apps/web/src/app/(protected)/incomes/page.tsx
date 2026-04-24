@@ -1,13 +1,13 @@
-import { auth } from "@valora/auth";
 import type { Route } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { IncomeFilters } from "@/features/incomes/components/income-filters";
 import { IncomeList } from "@/features/incomes/components/income-list";
 import { listIncomes } from "@/features/incomes/data/incomes.repo";
 import { incomeFiltersSchema } from "@/features/incomes/schemas";
+import { endOfMonth, startOfMonth, toISODate } from "@/lib/date";
+import { pickParam } from "@/lib/search-params";
+import { requireSession } from "@/lib/session";
 
 type SearchParams = {
 	month?: string | string[];
@@ -17,32 +17,24 @@ type SearchParams = {
 	toDate?: string | string[];
 };
 
-function pick(value?: string | string[]) {
-	return Array.isArray(value) ? value[0] : value;
-}
-
 export default async function IncomesPage({
 	searchParams,
 }: {
 	searchParams?: Promise<SearchParams>;
 }) {
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
-
+	const session = await requireSession();
 	const raw = await searchParams;
+
 	const now = new Date();
-	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-		.toISOString()
-		.slice(0, 10);
-	const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-		.toISOString()
-		.slice(0, 10);
+	const monthStart = toISODate(startOfMonth(now));
+	const monthEnd = toISODate(endOfMonth(now));
+
 	const parsed = incomeFiltersSchema.safeParse({
-		month: pick(raw?.month),
-		year: pick(raw?.year),
-		type: pick(raw?.type),
-		fromDate: pick(raw?.fromDate),
-		toDate: pick(raw?.toDate),
+		month: pickParam(raw?.month),
+		year: pickParam(raw?.year),
+		type: pickParam(raw?.type),
+		fromDate: pickParam(raw?.fromDate),
+		toDate: pickParam(raw?.toDate),
 	});
 
 	const filters = parsed.success ? parsed.data : {};

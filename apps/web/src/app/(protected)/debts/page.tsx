@@ -1,42 +1,33 @@
-import { auth } from "@valora/auth";
-import { headers } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 import { DebtFilters } from "@/features/debts/components/debt-filters";
 import { DebtList } from "@/features/debts/components/debt-list";
 import { listDebts } from "@/features/debts/data/debts.repo";
 import { debtFiltersSchema } from "@/features/debts/schemas";
+import { endOfMonth, startOfMonth, toISODate } from "@/lib/date";
+import { pickParam } from "@/lib/search-params";
+import { requireSession } from "@/lib/session";
 
 type SearchParams = {
 	fromDate?: string | string[];
 	toDate?: string | string[];
 };
 
-function pick(value?: string | string[]) {
-	return Array.isArray(value) ? value[0] : value;
-}
-
 export default async function DebtsPage({
 	searchParams,
 }: {
 	searchParams?: Promise<SearchParams>;
 }) {
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
-
+	const session = await requireSession();
 	const raw = await searchParams;
+
 	const now = new Date();
-	const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-		.toISOString()
-		.slice(0, 10);
-	const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-		.toISOString()
-		.slice(0, 10);
+	const monthStart = toISODate(startOfMonth(now));
+	const monthEnd = toISODate(endOfMonth(now));
 
 	const parsed = debtFiltersSchema.safeParse({
-		fromDate: pick(raw?.fromDate),
-		toDate: pick(raw?.toDate),
+		fromDate: pickParam(raw?.fromDate),
+		toDate: pickParam(raw?.toDate),
 	});
 	const filters = parsed.success ? parsed.data : {};
 	const fromDate = filters.fromDate ?? monthStart;

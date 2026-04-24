@@ -1,10 +1,9 @@
-import { auth } from "@valora/auth";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { DebtForm } from "@/features/debts/components/debt-form";
 import { getDebtById } from "@/features/debts/data/debts.repo";
 import { listRelatedPeople } from "@/features/debts/data/related-people.repo";
+import { requireSession } from "@/lib/session";
 
 export default async function EditDebtPage({
 	params,
@@ -12,9 +11,7 @@ export default async function EditDebtPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) redirect("/login");
+	const session = await requireSession();
 
 	const [debt, relatedPeople] = await Promise.all([
 		getDebtById(session.user.id, id),

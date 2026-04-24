@@ -10,6 +10,7 @@ type Props = {
 const WIDTH = 920;
 const HEIGHT = 320;
 const PADDING = { top: 20, right: 20, bottom: 30, left: 20 };
+const X_LABEL_INTERVAL = 5;
 
 export function IncomeExpenseChart({ data, periodDate }: Props) {
 	const chartW = WIDTH - PADDING.left - PADDING.right;
@@ -18,8 +19,8 @@ export function IncomeExpenseChart({ data, periodDate }: Props) {
 	const slot = chartW / data.length;
 	const barW = Math.max(2, slot / 2.6);
 
-	const totalIncome = data.reduce((s, d) => s + d.income, 0);
-	const totalExpense = data.reduce((s, d) => s + d.expense, 0);
+	const totalIncome = data.reduce((sum, d) => sum + d.income, 0);
+	const totalExpense = data.reduce((sum, d) => sum + d.expense, 0);
 
 	return (
 		<section className="rounded-[22px] border border-border bg-card p-6">
@@ -48,13 +49,13 @@ export function IncomeExpenseChart({ data, periodDate }: Props) {
 				aria-label="Gráfico entradas e saídas por dia"
 			>
 				<title>Entradas e saídas por dia</title>
-				{[0.25, 0.5, 0.75, 1].map((r) => (
+				{[0.25, 0.5, 0.75, 1].map((ratio) => (
 					<line
-						key={r}
+						key={ratio}
 						x1={PADDING.left}
 						x2={WIDTH - PADDING.right}
-						y1={PADDING.top + chartH * (1 - r)}
-						y2={PADDING.top + chartH * (1 - r)}
+						y1={PADDING.top + chartH * (1 - ratio)}
+						y2={PADDING.top + chartH * (1 - ratio)}
 						stroke="currentColor"
 						strokeOpacity={0.08}
 					/>
@@ -85,25 +86,21 @@ export function IncomeExpenseChart({ data, periodDate }: Props) {
 						</g>
 					);
 				})}
-				{data
-					.filter((_, i) => i % 5 === 0)
-					.map((d) => {
-						const idx = data.findIndex((x) => x.day === d.day);
-						const x = PADDING.left + idx * slot + slot / 2;
-						return (
-							<text
-								key={d.day}
-								x={x}
-								y={HEIGHT - 6}
-								textAnchor="middle"
-								fill="currentColor"
-								opacity={0.6}
-								fontSize={11}
-							>
-								{d.day}
-							</text>
-						);
-					})}
+				{data.map((d, i) =>
+					i % X_LABEL_INTERVAL === 0 ? (
+						<text
+							key={d.day}
+							x={PADDING.left + i * slot + slot / 2}
+							y={HEIGHT - 6}
+							textAnchor="middle"
+							fill="currentColor"
+							opacity={0.6}
+							fontSize={11}
+						>
+							{d.day}
+						</text>
+					) : null,
+				)}
 			</svg>
 		</section>
 	);

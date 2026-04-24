@@ -1,0 +1,51 @@
+import type RGL from "react-grid-layout";
+
+const KPI_MIN = { minW: 2, minH: 4 };
+
+export const DEFAULT_LAYOUTS: RGL.Layouts = {
+	lg: [
+		{ i: "kpi-balance", x: 0, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-projected-balance", x: 4, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-debt", x: 8, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-receivable", x: 0, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-expense", x: 4, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-income", x: 8, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-tax-due", x: 0, y: 14, w: 4, h: 7, ...KPI_MIN },
+		{ i: "income-expense", x: 0, y: 21, w: 8, h: 13, minW: 4, minH: 8 },
+		{ i: "upcoming-bills", x: 8, y: 21, w: 4, h: 7, minW: 3, minH: 5 },
+		{ i: "people-owing", x: 8, y: 28, w: 4, h: 7, minW: 3, minH: 5 },
+		{ i: "receivables", x: 8, y: 35, w: 4, h: 6, minW: 3, minH: 4 },
+		{ i: "expense-trend", x: 0, y: 34, w: 7, h: 12, minW: 4, minH: 8 },
+		{ i: "weekly-expense", x: 7, y: 41, w: 5, h: 12, minW: 3, minH: 8 },
+	],
+	md: [
+		{ i: "kpi-balance", x: 0, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-projected-balance", x: 4, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-debt", x: 0, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-receivable", x: 4, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-expense", x: 0, y: 14, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-income", x: 4, y: 14, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-tax-due", x: 0, y: 21, w: 8, h: 7, ...KPI_MIN },
+		{ i: "income-expense", x: 0, y: 28, w: 8, h: 12, minW: 4, minH: 8 },
+		{ i: "upcoming-bills", x: 0, y: 40, w: 4, h: 7, minW: 3, minH: 5 },
+		{ i: "people-owing", x: 4, y: 40, w: 4, h: 7, minW: 3, minH: 5 },
+		{ i: "receivables", x: 0, y: 47, w: 4, h: 6, minW: 3, minH: 4 },
+		{ i: "expense-trend", x: 4, y: 47, w: 4, h: 11, minW: 4, minH: 8 },
+		{ i: "weekly-expense", x: 0, y: 58, w: 8, h: 11, minW: 3, minH: 8 },
+	],
+	sm: [
+		{ i: "kpi-balance", x: 0, y: 0, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-projected-balance", x: 0, y: 7, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-debt", x: 0, y: 14, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-total-receivable", x: 0, y: 21, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-expense", x: 0, y: 28, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-income", x: 0, y: 35, w: 4, h: 7, ...KPI_MIN },
+		{ i: "kpi-month-tax-due", x: 0, y: 42, w: 4, h: 7, ...KPI_MIN },
+		{ i: "income-expense", x: 0, y: 49, w: 4, h: 12, minW: 2, minH: 8 },
+		{ i: "upcoming-bills", x: 0, y: 61, w: 4, h: 7, minW: 2, minH: 5 },
+		{ i: "people-owing", x: 0, y: 68, w: 4, h: 7, minW: 2, minH: 5 },
+		{ i: "receivables", x: 0, y: 75, w: 4, h: 6, minW: 2, minH: 4 },
+		{ i: "expense-trend", x: 0, y: 81, w: 4, h: 11, minW: 2, minH: 8 },
+		{ i: "weekly-expense", x: 0, y: 92, w: 4, h: 11, minW: 2, minH: 8 },
+	],
+};

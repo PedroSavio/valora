@@ -1,16 +1,15 @@
 "use server";
 
-import { auth } from "@valora/auth";
 import { prisma } from "@valora/auth/prisma";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
+
+import { requireUserId } from "@/lib/session";
 
 export async function settleDebt(debtId: string): Promise<void> {
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) throw new Error("unauthorized");
+	const userId = await requireUserId();
 
 	const debt = await prisma.debt.findFirst({
-		where: { id: debtId, userId: session.user.id },
+		where: { id: debtId, userId },
 		select: { id: true, status: true },
 	});
 	if (!debt) throw new Error("debt_not_found");

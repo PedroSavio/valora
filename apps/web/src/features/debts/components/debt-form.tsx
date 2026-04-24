@@ -4,26 +4,20 @@ import { useForm } from "@tanstack/react-form";
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { FormField, formInputClass } from "@/components/form-field";
+import { EXPENSE_CATEGORIES } from "@/lib/categories";
+import { toISODate } from "@/lib/date";
+
 import { createDebt } from "../actions/create-debt";
 import { updateDebt } from "../actions/update-debt";
 import { createDebtSchema } from "../schemas";
-
-const CATEGORIES = [
-	"Alimentação",
-	"Transporte",
-	"Serviços",
-	"Moradia",
-	"Saúde",
-	"Lazer",
-	"Educação",
-	"Cartão",
-	"Outros",
-];
 
 type RelatedPersonOption = {
 	id: string;
 	name: string;
 };
+
+type DebtChild = { id?: string; title: string; amount: number };
 
 type DebtFormValues = {
 	title: string;
@@ -34,7 +28,7 @@ type DebtFormValues = {
 	direction: "PAYABLE" | "RECEIVABLE";
 	personId: string;
 	personName: string;
-	children?: { id?: string; title: string; amount: number }[];
+	children?: DebtChild[];
 	dueDate: string;
 	notes: string;
 };
@@ -46,6 +40,27 @@ type DebtFormProps = {
 	initialValues?: DebtFormValues;
 };
 
+const DEFAULT_VALUES: DebtFormValues = {
+	title: "",
+	amount: 0,
+	category: "Outros",
+	type: "VARIABLE",
+	recurrence: "NONE",
+	direction: "PAYABLE",
+	personId: "",
+	personName: "",
+	children: [],
+	dueDate: toISODate(new Date()),
+	notes: "",
+};
+
+function sumChildren(children: DebtChild[]): number {
+	return children.reduce(
+		(sum, child) => sum + (Number.isFinite(child.amount) ? child.amount : 0),
+		0,
+	);
+}
+
 export function DebtForm({
 	relatedPeople,
 	mode = "create",
@@ -56,54 +71,28 @@ export function DebtForm({
 	const [hasChildren, setHasChildren] = useState<boolean>(
 		(initialValues?.children?.length ?? 0) > 0,
 	);
-	const [children, setChildren] = useState<
-		{ id?: string; title: string; amount: number }[]
-	>(initialValues?.children ?? []);
-
-	const childrenTotal = useMemo(
-		() =>
-			children.reduce(
-				(sum, child) =>
-					sum + (Number.isFinite(child.amount) ? child.amount : 0),
-				0,
-			),
-		[children],
+	const [children, setChildren] = useState<DebtChild[]>(
+		initialValues?.children ?? [],
 	);
 
+	const childrenTotal = useMemo(() => sumChildren(children), [children]);
+
 	const form = useForm({
-		defaultValues:
-			initialValues ??
-			({
-				title: "",
-				amount: 0,
-				category: "Outros",
-				type: "VARIABLE",
-				recurrence: "NONE",
-				direction: "PAYABLE",
-				personId: "",
-				personName: "",
-				children: [],
-				dueDate: new Date().toISOString().slice(0, 10),
-				notes: "",
-			} satisfies DebtFormValues),
+		defaultValues: initialValues ?? DEFAULT_VALUES,
 		validators: { onSubmit: createDebtSchema },
 		onSubmit: ({ value }) =>
 			startTransition(async () => {
 				try {
+					const payload = {
+						...value,
+						amount: hasChildren ? childrenTotal : value.amount,
+						children: hasChildren ? children : [],
+					};
 					if (mode === "edit") {
 						if (!debtId) throw new Error("debt_id_required");
-						await updateDebt({
-							id: debtId,
-							...value,
-							amount: hasChildren ? childrenTotal : value.amount,
-							children: hasChildren ? children : [],
-						});
+						await updateDebt({ id: debtId, ...payload });
 					} else {
-						await createDebt({
-							...value,
-							amount: hasChildren ? childrenTotal : value.amount,
-							children: hasChildren ? children : [],
-						});
+						await createDebt(payload);
 					}
 				} catch (err) {
 					toast.error(err instanceof Error ? err.message : "Falha ao salvar");
@@ -111,8 +100,7 @@ export function DebtForm({
 			}),
 	});
 
-	const inputCls =
-		"w-full rounded-[14px] border border-border bg-card px-4 py-3 text-sm outline-none focus:border-primary/60";
+	const isReceivable = form.state.values.direction === "RECEIVABLE";
 
 	return (
 		<form
@@ -124,26 +112,26 @@ export function DebtForm({
 		>
 			<form.Field name="title">
 				{(field) => (
-					<Field
+					<FormField
 						label="Título"
 						error={field.state.meta.errors[0]?.message}
 						className="sm:col-span-2"
 					>
 						<input
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 							onBlur={field.handleBlur}
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="direction">
 				{(field) => (
-					<Field label="Tipo de registro">
+					<FormField label="Tipo de registro">
 						<select
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) =>
 								field.handleChange(e.target.value as "PAYABLE" | "RECEIVABLE")
@@ -156,45 +144,51 @@ export function DebtForm({
 								A pessoa me deve
 							</option>
 						</select>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="amount">
 				{(field) => (
-					<Field label="Valor (R$)" error={field.state.meta.errors[0]?.message}>
+					<FormField
+						label="Valor (R$)"
+						error={field.state.meta.errors[0]?.message}
+					>
 						<input
 							type="number"
 							step="0.01"
-							className={inputCls}
+							className={formInputClass}
 							value={hasChildren ? childrenTotal : field.state.value}
 							onChange={(e) => field.handleChange(Number(e.target.value))}
 							readOnly={hasChildren}
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="dueDate">
 				{(field) => (
-					<Field label="Vencimento" error={field.state.meta.errors[0]?.message}>
+					<FormField
+						label="Vencimento"
+						error={field.state.meta.errors[0]?.message}
+					>
 						<input
 							type="date"
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
-			{form.state.values.direction === "RECEIVABLE" ? (
+			{isReceivable ? (
 				<>
 					<form.Field name="personId">
 						{(field) => (
-							<Field label="Pessoa relacionada">
+							<FormField label="Pessoa relacionada">
 								<select
-									className={inputCls}
+									className={formInputClass}
 									value={field.state.value}
 									onChange={(e) => field.handleChange(e.target.value)}
 								>
@@ -207,24 +201,24 @@ export function DebtForm({
 										</option>
 									))}
 								</select>
-							</Field>
+							</FormField>
 						)}
 					</form.Field>
 
 					<form.Field name="personName">
 						{(field) => (
-							<Field
+							<FormField
 								label="Ou nova pessoa"
 								error={field.state.meta.errors[0]?.message}
 							>
 								<input
-									className={inputCls}
+									className={formInputClass}
 									placeholder="Nome da pessoa"
 									value={field.state.value}
 									onChange={(e) => field.handleChange(e.target.value)}
 									onBlur={field.handleBlur}
 								/>
-							</Field>
+							</FormField>
 						)}
 					</form.Field>
 				</>
@@ -232,27 +226,27 @@ export function DebtForm({
 
 			<form.Field name="category">
 				{(field) => (
-					<Field label="Categoria">
+					<FormField label="Categoria">
 						<select
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 						>
-							{CATEGORIES.map((c) => (
+							{EXPENSE_CATEGORIES.map((c) => (
 								<option key={c} value={c} className="bg-card">
 									{c}
 								</option>
 							))}
 						</select>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="type">
 				{(field) => (
-					<Field label="Tipo">
+					<FormField label="Tipo">
 						<select
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) =>
 								field.handleChange(e.target.value as "FIXED" | "VARIABLE")
@@ -265,15 +259,15 @@ export function DebtForm({
 								Fixa
 							</option>
 						</select>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="recurrence">
 				{(field) => (
-					<Field label="Recorrência">
+					<FormField label="Recorrência">
 						<select
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) =>
 								field.handleChange(
@@ -294,19 +288,19 @@ export function DebtForm({
 								Anual
 							</option>
 						</select>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="notes">
 				{(field) => (
-					<Field label="Notas" className="sm:col-span-2">
+					<FormField label="Notas" className="sm:col-span-2">
 						<textarea
-							className={`${inputCls} min-h-[80px]`}
+							className={`${formInputClass} min-h-[80px]`}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
@@ -340,7 +334,7 @@ export function DebtForm({
 								className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_180px_auto]"
 							>
 								<input
-									className={inputCls}
+									className={formInputClass}
 									placeholder="Descrição do item"
 									value={child.title}
 									onChange={(e) =>
@@ -354,7 +348,7 @@ export function DebtForm({
 								<input
 									type="number"
 									step="0.01"
-									className={inputCls}
+									className={formInputClass}
 									placeholder="Valor"
 									value={child.amount}
 									onChange={(e) =>
@@ -419,25 +413,5 @@ export function DebtForm({
 				</button>
 			</div>
 		</form>
-	);
-}
-
-function Field({
-	label,
-	error,
-	className,
-	children,
-}: {
-	label: string;
-	error?: string;
-	className?: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<div className={`flex flex-col gap-1.5 ${className ?? ""}`}>
-			<span className="font-medium text-muted-foreground text-xs">{label}</span>
-			{children}
-			{error ? <span className="text-destructive text-xs">{error}</span> : null}
-		</div>
 	);
 }

@@ -10,19 +10,17 @@ type Props = {
 const WIDTH = 860;
 const HEIGHT = 320;
 const PADDING = { top: 20, right: 18, bottom: 32, left: 18 };
+const X_LABEL_INTERVAL = 6;
 
 export function ExpenseTrendChart({ data, periodDate }: Props) {
 	const chartW = WIDTH - PADDING.left - PADDING.right;
 	const chartH = HEIGHT - PADDING.top - PADDING.bottom;
 
-	const accumulated = data.reduce<Array<{ day: number; value: number }>>(
-		(acc, item, index) => {
-			const prev = index === 0 ? 0 : (acc[index - 1]?.value ?? 0);
-			acc.push({ day: item.day, value: prev + item.expense });
-			return acc;
-		},
-		[],
-	);
+	let runningTotal = 0;
+	const accumulated = data.map((item) => {
+		runningTotal += item.expense;
+		return { day: item.day, value: runningTotal };
+	});
 
 	const max = Math.max(1, ...accumulated.map((d) => d.value));
 	const step =
@@ -36,9 +34,11 @@ export function ExpenseTrendChart({ data, periodDate }: Props) {
 		})
 		.join(" ");
 
-	const area = `${PADDING.left},${HEIGHT - PADDING.bottom} ${points} ${
+	const areaPoints = `${PADDING.left},${HEIGHT - PADDING.bottom} ${points} ${
 		WIDTH - PADDING.right
 	},${HEIGHT - PADDING.bottom}`;
+
+	const total = accumulated.at(-1)?.value ?? 0;
 
 	return (
 		<section className="h-full rounded-[22px] border border-border bg-card p-6">
@@ -52,7 +52,7 @@ export function ExpenseTrendChart({ data, periodDate }: Props) {
 					</p>
 				</div>
 				<span className="rounded-full bg-destructive/15 px-3 py-1 font-medium text-destructive text-xs">
-					Total: {formatBRL(accumulated.at(-1)?.value ?? 0)}
+					Total: {formatBRL(total)}
 				</span>
 			</header>
 
@@ -63,43 +63,43 @@ export function ExpenseTrendChart({ data, periodDate }: Props) {
 				aria-label="Gráfico de tendência acumulada de gastos"
 			>
 				<title>Gastos acumulados por dia</title>
-				{[0.25, 0.5, 0.75, 1].map((r) => (
+				{[0.25, 0.5, 0.75, 1].map((ratio) => (
 					<line
-						key={r}
+						key={ratio}
 						x1={PADDING.left}
 						x2={WIDTH - PADDING.right}
-						y1={PADDING.top + chartH * (1 - r)}
-						y2={PADDING.top + chartH * (1 - r)}
+						y1={PADDING.top + chartH * (1 - ratio)}
+						y2={PADDING.top + chartH * (1 - ratio)}
 						stroke="currentColor"
 						strokeOpacity={0.08}
 					/>
 				))}
-				<polygon points={area} fill="var(--destructive)" fillOpacity={0.12} />
+				<polygon
+					points={areaPoints}
+					fill="var(--destructive)"
+					fillOpacity={0.12}
+				/>
 				<polyline
 					points={points}
 					fill="none"
 					stroke="var(--destructive)"
 					strokeWidth={2.5}
 				/>
-				{accumulated
-					.map((d, i) => ({ ...d, index: i }))
-					.filter((d) => d.index % 6 === 0)
-					.map((d) => {
-						const x = PADDING.left + d.index * step;
-						return (
-							<text
-								key={`${d.day}-${d.index}`}
-								x={x}
-								y={HEIGHT - 8}
-								textAnchor="middle"
-								fill="currentColor"
-								opacity={0.6}
-								fontSize={11}
-							>
-								{d.day}
-							</text>
-						);
-					})}
+				{accumulated.map((d, i) =>
+					i % X_LABEL_INTERVAL === 0 ? (
+						<text
+							key={d.day}
+							x={PADDING.left + i * step}
+							y={HEIGHT - 8}
+							textAnchor="middle"
+							fill="currentColor"
+							opacity={0.6}
+							fontSize={11}
+						>
+							{d.day}
+						</text>
+					) : null,
+				)}
 			</svg>
 		</section>
 	);

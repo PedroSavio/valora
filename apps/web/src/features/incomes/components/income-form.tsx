@@ -4,6 +4,8 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+import { FormField, formInputClass } from "@/components/form-field";
+import { toISODate } from "@/lib/date";
 import { formatBRL } from "@/lib/format";
 
 import { createIncome } from "../actions/create-income";
@@ -22,6 +24,16 @@ type IncomeFormProps = {
 	mode?: "create" | "edit";
 	incomeId?: string;
 	initialValues?: IncomeFormValues;
+};
+
+const DEFAULT_PJ_TAX_RATE = 6;
+
+const DEFAULT_VALUES: IncomeFormValues = {
+	type: "CLT",
+	amount: 0,
+	taxRate: DEFAULT_PJ_TAX_RATE,
+	date: toISODate(new Date()),
+	description: "",
 };
 
 const nextMonthFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -54,6 +66,10 @@ function parseMoneyInput(raw: string): number {
 	return Number(digits) / 100;
 }
 
+function calculateEstimatedTax(amount: number, taxRate: number): number {
+	return Math.max(0, ((Number(amount) || 0) * (Number(taxRate) || 0)) / 100);
+}
+
 export function IncomeForm({
 	mode = "create",
 	incomeId,
@@ -62,15 +78,7 @@ export function IncomeForm({
 	const [isPending, startTransition] = useTransition();
 
 	const form = useForm({
-		defaultValues:
-			initialValues ??
-			({
-				type: "CLT",
-				amount: 0,
-				taxRate: 6,
-				date: new Date().toISOString().slice(0, 10),
-				description: "",
-			} satisfies IncomeFormValues),
+		defaultValues: initialValues ?? DEFAULT_VALUES,
 		validators: { onSubmit: createIncomeSchema },
 		onSubmit: ({ value }) =>
 			startTransition(async () => {
@@ -92,9 +100,6 @@ export function IncomeForm({
 	const taxRateValue = useStore(form.store, (s) => s.values.taxRate);
 	const dateValue = useStore(form.store, (s) => s.values.date);
 
-	const inputCls =
-		"w-full rounded-[14px] border border-border bg-card px-4 py-3 text-sm outline-none focus:border-primary/60";
-
 	return (
 		<form
 			onSubmit={(e) => {
@@ -105,9 +110,9 @@ export function IncomeForm({
 		>
 			<form.Field name="type">
 				{(field) => (
-					<Field label="Tipo">
+					<FormField label="Tipo">
 						<select
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) =>
 								field.handleChange(e.target.value as "CLT" | "PJ")
@@ -120,24 +125,24 @@ export function IncomeForm({
 								PJ
 							</option>
 						</select>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="amount">
 				{(field) => (
-					<Field label="Valor" error={field.state.meta.errors[0]?.message}>
+					<FormField label="Valor" error={field.state.meta.errors[0]?.message}>
 						<input
 							type="text"
 							inputMode="numeric"
-							className={inputCls}
+							className={formInputClass}
 							value={formatMoneyInput(field.state.value)}
 							onChange={(e) =>
 								field.handleChange(parseMoneyInput(e.target.value))
 							}
 							placeholder="R$ 0,00"
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
@@ -145,7 +150,7 @@ export function IncomeForm({
 				<>
 					<form.Field name="taxRate">
 						{(field) => (
-							<Field
+							<FormField
 								label="Imposto (%)"
 								error={field.state.meta.errors[0]?.message}
 							>
@@ -155,14 +160,14 @@ export function IncomeForm({
 									min="0"
 									max="100"
 									inputMode="decimal"
-									className={inputCls}
+									className={formInputClass}
 									value={field.state.value || ""}
 									onChange={(e) => {
 										const v = e.target.value;
 										field.handleChange(v === "" ? 0 : Number(v));
 									}}
 								/>
-							</Field>
+							</FormField>
 						)}
 					</form.Field>
 
@@ -170,14 +175,7 @@ export function IncomeForm({
 						<p className="text-sm text-yellow-900">
 							Imposto estimado:{" "}
 							<strong>
-								{formatBRL(
-									Math.max(
-										0,
-										((Number(amountValue) || 0) *
-											(Number(taxRateValue) || 0)) /
-											100,
-									),
-								)}
+								{formatBRL(calculateEstimatedTax(amountValue, taxRateValue))}
 							</strong>{" "}
 							a pagar em <strong>{nextMonthLabel(dateValue)}</strong>.
 						</p>
@@ -187,27 +185,27 @@ export function IncomeForm({
 
 			<form.Field name="date">
 				{(field) => (
-					<Field label="Data" error={field.state.meta.errors[0]?.message}>
+					<FormField label="Data" error={field.state.meta.errors[0]?.message}>
 						<input
 							type="date"
-							className={inputCls}
+							className={formInputClass}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
 			<form.Field name="description">
 				{(field) => (
-					<Field label="Descrição" className="sm:col-span-2">
+					<FormField label="Descrição" className="sm:col-span-2">
 						<textarea
-							className={`${inputCls} min-h-[80px]`}
+							className={`${formInputClass} min-h-[80px]`}
 							value={field.state.value}
 							onChange={(e) => field.handleChange(e.target.value)}
 							placeholder="Ex.: Salário Empresa X · NF #123"
 						/>
-					</Field>
+					</FormField>
 				)}
 			</form.Field>
 
@@ -225,25 +223,5 @@ export function IncomeForm({
 				</button>
 			</div>
 		</form>
-	);
-}
-
-function Field({
-	label,
-	error,
-	className,
-	children,
-}: {
-	label: string;
-	error?: string;
-	className?: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<div className={`flex flex-col gap-1.5 ${className ?? ""}`}>
-			<span className="font-medium text-muted-foreground text-xs">{label}</span>
-			{children}
-			{error ? <span className="text-destructive text-xs">{error}</span> : null}
-		</div>
 	);
 }

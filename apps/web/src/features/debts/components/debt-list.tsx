@@ -5,6 +5,8 @@ import { deleteDebt } from "@/features/debts/actions/delete-debt";
 import { settleDebt } from "@/features/debts/actions/settle-debt";
 import { formatBRL, formatShortDate } from "@/lib/format";
 
+type DebtDirection = "PAYABLE" | "RECEIVABLE";
+
 type Debt = {
 	id: string;
 	title: string;
@@ -13,10 +15,25 @@ type Debt = {
 	status: string;
 	source: string;
 	childCount: number;
-	direction: "PAYABLE" | "RECEIVABLE";
+	direction: DebtDirection;
 	personName: string | null;
 	dueDate: string;
 };
+
+const STATUS_LABELS: Record<string, string> = {
+	OPEN: "Em aberto",
+	PAID: "Pago",
+	OVERDUE: "Vencida",
+	CANCELED: "Cancelada",
+};
+
+function directionLabel(direction: DebtDirection) {
+	return direction === "RECEIVABLE" ? "Te devem" : "Você deve";
+}
+
+function statusLabel(status: string) {
+	return STATUS_LABELS[status] ?? status;
+}
 
 export function DebtList({ debts }: { debts: Debt[] }) {
 	if (debts.length === 0) {
@@ -29,49 +46,53 @@ export function DebtList({ debts }: { debts: Debt[] }) {
 
 	return (
 		<ul className="grid grid-cols-1 gap-3">
-			{debts.map((d) => (
+			{debts.map((debt) => (
 				<li
-					key={d.id}
+					key={debt.id}
 					className="flex items-center justify-between rounded-[18px] border border-border bg-card p-4"
 				>
 					<div className="flex items-center gap-3">
 						<span className="flex size-10 items-center justify-center rounded-full bg-black/30 text-muted-foreground">
-							{d.source === "BILL" ? (
+							{debt.source === "BILL" ? (
 								<Sparkles className="size-4" />
 							) : (
 								<Receipt className="size-4" />
 							)}
 						</span>
 						<div>
-							<p className="font-medium text-foreground">{d.title}</p>
+							<p className="font-medium text-foreground">{debt.title}</p>
 							<p className="flex items-center gap-2 text-muted-foreground text-xs">
 								<Calendar className="size-3" />
-								{formatShortDate(d.dueDate.slice(0, 10))} ·{" "}
-								{directionLabel(d.direction)}
-								{d.personName ? ` · ${d.personName}` : ""} · {d.category} ·{" "}
-								{statusLabel(d.status)}
-								{d.childCount > 0 ? ` · ${d.childCount} itens` : ""}
-								{d.source === "BILL" && d.childCount > 0 ? " · Fatura" : ""}
+								{formatShortDate(debt.dueDate)} ·{" "}
+								{directionLabel(debt.direction)}
+								{debt.personName ? ` · ${debt.personName}` : ""} ·{" "}
+								{debt.category} · {statusLabel(debt.status)}
+								{debt.childCount > 0 ? ` · ${debt.childCount} itens` : ""}
+								{debt.source === "BILL" && debt.childCount > 0
+									? " · Fatura"
+									: ""}
 							</p>
 						</div>
 					</div>
 					<div className="flex items-center gap-3">
-						<span className="font-semibold text-sm">{formatBRL(d.amount)}</span>
-						<form action={settleDebt.bind(null, d.id)}>
+						<span className="font-semibold text-sm">
+							{formatBRL(debt.amount)}
+						</span>
+						<form action={settleDebt.bind(null, debt.id)}>
 							<button
 								type="submit"
 								className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
 							>
-								{d.status === "PAID" ? "Reabrir" : "Dar baixa"}
+								{debt.status === "PAID" ? "Reabrir" : "Dar baixa"}
 							</button>
 						</form>
 						<Link
-							href={`/debts/${d.id}/edit`}
+							href={`/debts/${debt.id}/edit`}
 							className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-xs hover:bg-card/70"
 						>
 							Editar
 						</Link>
-						<form action={deleteDebt.bind(null, d.id)}>
+						<form action={deleteDebt.bind(null, debt.id)}>
 							<button
 								type="submit"
 								className="inline-flex h-9 items-center gap-1 rounded-md border border-border px-3 font-medium text-destructive text-xs hover:bg-destructive/10"
@@ -85,23 +106,4 @@ export function DebtList({ debts }: { debts: Debt[] }) {
 			))}
 		</ul>
 	);
-}
-
-function directionLabel(direction: "PAYABLE" | "RECEIVABLE") {
-	return direction === "RECEIVABLE" ? "Te devem" : "Você deve";
-}
-
-function statusLabel(s: string) {
-	switch (s) {
-		case "OPEN":
-			return "Em aberto";
-		case "PAID":
-			return "Pago";
-		case "OVERDUE":
-			return "Vencida";
-		case "CANCELED":
-			return "Cancelada";
-		default:
-			return s;
-	}
 }

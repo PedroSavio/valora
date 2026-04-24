@@ -1,21 +1,19 @@
 "use server";
 
-import { auth } from "@valora/auth";
 import { prisma } from "@valora/auth/prisma";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+
+import { requireUserId } from "@/lib/session";
 
 import { updateDebtSchema } from "../schemas";
 
 export async function updateDebt(raw: unknown): Promise<void> {
-	const session = await auth.api.getSession({ headers: await headers() });
-	if (!session?.user) throw new Error("unauthorized");
-
+	const userId = await requireUserId();
 	const input = updateDebtSchema.parse(raw);
 
 	await prisma.$transaction(async (tx) => {
 		const target = await tx.debt.findFirst({
-			where: { id: input.id, userId: session.user.id },
+			where: { id: input.id, userId },
 			select: { id: true },
 		});
 		if (!target) throw new Error("debt_not_found");
@@ -28,14 +26,14 @@ export async function updateDebt(raw: unknown): Promise<void> {
 			input.personName.trim()
 		) {
 			const created = await tx.relatedPerson.create({
-				data: {
-					userId: session.user.id,
-					name: input.personName.trim(),
-				},
+				data: { userId, name: input.personName.trim() },
 				select: { id: true },
 			});
 			personId = created.id;
 		}
+
+		const dueDate = new Date(input.dueDate);
+		const resolvedPersonId = input.direction === "RECEIVABLE" ? personId : null;
 
 		const children = (input.children ?? []).filter(
 			(c) => c.title.trim().length > 0,
@@ -54,14 +52,14 @@ export async function updateDebt(raw: unknown): Promise<void> {
 				type: input.type,
 				recurrence: input.recurrence,
 				direction: input.direction,
-				personId: input.direction === "RECEIVABLE" ? personId : null,
-				dueDate: new Date(input.dueDate),
+				personId: resolvedPersonId,
+				dueDate,
 				notes: input.notes,
 			},
 		});
 
 		const existingChildren = await tx.debt.findMany({
-			where: { parentDebtId: target.id, userId: session.user.id },
+			where: { parentDebtId: target.id, userId },
 			select: { id: true },
 		});
 		const existingIds = new Set(existingChildren.map((c) => c.id));
@@ -70,35 +68,30 @@ export async function updateDebt(raw: unknown): Promise<void> {
 		);
 
 		for (const child of children) {
+			const childData = {
+				title: child.title.trim(),
+				amount: child.amount,
+				category: input.category,
+				type: input.type,
+				recurrence: input.recurrence,
+				direction: input.direction,
+				personId: resolvedPersonId,
+				dueDate,
+			};
+
 			if (child.id && existingIds.has(child.id)) {
 				await tx.debt.update({
 					where: { id: child.id },
-					data: {
-						title: child.title.trim(),
-						amount: child.amount,
-						category: input.category,
-						type: input.type,
-						recurrence: input.recurrence,
-						direction: input.direction,
-						personId: input.direction === "RECEIVABLE" ? personId : null,
-						dueDate: new Date(input.dueDate),
-					},
+					data: childData,
 				});
 			} else {
 				await tx.debt.create({
 					data: {
-						userId: session.user.id,
+						userId,
 						parentDebtId: target.id,
-						title: child.title.trim(),
-						amount: child.amount,
-						category: input.category,
-						type: input.type,
-						recurrence: input.recurrence,
-						direction: input.direction,
-						personId: input.direction === "RECEIVABLE" ? personId : null,
-						dueDate: new Date(input.dueDate),
 						source: "MANUAL",
 						status: "OPEN",
+						...childData,
 					},
 				});
 			}
@@ -109,7 +102,7 @@ export async function updateDebt(raw: unknown): Promise<void> {
 			.filter((id) => !submittedIds.has(id));
 		if (removeIds.length > 0) {
 			await tx.debt.deleteMany({
-				where: { id: { in: removeIds }, userId: session.user.id },
+				where: { id: { in: removeIds }, userId },
 			});
 		}
 	});
