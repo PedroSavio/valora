@@ -6385,10 +6385,12 @@ export namespace Prisma {
 
   export type IncomeAvgAggregateOutputType = {
     amount: Decimal | null
+    taxRate: Decimal | null
   }
 
   export type IncomeSumAggregateOutputType = {
     amount: Decimal | null
+    taxRate: Decimal | null
   }
 
   export type IncomeMinAggregateOutputType = {
@@ -6396,6 +6398,7 @@ export namespace Prisma {
     userId: string | null
     type: $Enums.IncomeType | null
     amount: Decimal | null
+    taxRate: Decimal | null
     date: Date | null
     description: string | null
     createdAt: Date | null
@@ -6407,6 +6410,7 @@ export namespace Prisma {
     userId: string | null
     type: $Enums.IncomeType | null
     amount: Decimal | null
+    taxRate: Decimal | null
     date: Date | null
     description: string | null
     createdAt: Date | null
@@ -6418,6 +6422,7 @@ export namespace Prisma {
     userId: number
     type: number
     amount: number
+    taxRate: number
     date: number
     description: number
     createdAt: number
@@ -6428,10 +6433,12 @@ export namespace Prisma {
 
   export type IncomeAvgAggregateInputType = {
     amount?: true
+    taxRate?: true
   }
 
   export type IncomeSumAggregateInputType = {
     amount?: true
+    taxRate?: true
   }
 
   export type IncomeMinAggregateInputType = {
@@ -6439,6 +6446,7 @@ export namespace Prisma {
     userId?: true
     type?: true
     amount?: true
+    taxRate?: true
     date?: true
     description?: true
     createdAt?: true
@@ -6450,6 +6458,7 @@ export namespace Prisma {
     userId?: true
     type?: true
     amount?: true
+    taxRate?: true
     date?: true
     description?: true
     createdAt?: true
@@ -6461,6 +6470,7 @@ export namespace Prisma {
     userId?: true
     type?: true
     amount?: true
+    taxRate?: true
     date?: true
     description?: true
     createdAt?: true
@@ -6559,6 +6569,7 @@ export namespace Prisma {
     userId: string
     type: $Enums.IncomeType
     amount: Decimal
+    taxRate: Decimal
     date: Date
     description: string | null
     createdAt: Date
@@ -6589,6 +6600,7 @@ export namespace Prisma {
     userId?: boolean
     type?: boolean
     amount?: boolean
+    taxRate?: boolean
     date?: boolean
     description?: boolean
     createdAt?: boolean
@@ -6601,6 +6613,7 @@ export namespace Prisma {
     userId?: boolean
     type?: boolean
     amount?: boolean
+    taxRate?: boolean
     date?: boolean
     description?: boolean
     createdAt?: boolean
@@ -6616,6 +6629,7 @@ export namespace Prisma {
       userId: string
       type: $Enums.IncomeType
       amount: Prisma.Decimal
+      taxRate: Prisma.Decimal
       date: Date
       description: string | null
       createdAt: Date
@@ -6993,6 +7007,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"Income", 'String'>
     readonly type: FieldRef<"Income", 'IncomeType'>
     readonly amount: FieldRef<"Income", 'Decimal'>
+    readonly taxRate: FieldRef<"Income", 'Decimal'>
     readonly date: FieldRef<"Income", 'DateTime'>
     readonly description: FieldRef<"Income", 'String'>
     readonly createdAt: FieldRef<"Income", 'DateTime'>
@@ -10505,6 +10520,7 @@ export namespace Prisma {
     userId: 'userId',
     type: 'type',
     amount: 'amount',
+    taxRate: 'taxRate',
     date: 'date',
     description: 'description',
     createdAt: 'createdAt',
@@ -11051,6 +11067,7 @@ export namespace Prisma {
     userId?: StringFilter<"Income"> | string
     type?: EnumIncomeTypeFilter<"Income"> | $Enums.IncomeType
     amount?: DecimalFilter<"Income"> | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFilter<"Income"> | Decimal | DecimalJsLike | number | string
     date?: DateTimeFilter<"Income"> | Date | string
     description?: StringNullableFilter<"Income"> | string | null
     createdAt?: DateTimeFilter<"Income"> | Date | string
@@ -11062,6 +11079,7 @@ export namespace Prisma {
     userId?: SortOrder
     type?: SortOrder
     amount?: SortOrder
+    taxRate?: SortOrder
     date?: SortOrder
     description?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -11076,6 +11094,7 @@ export namespace Prisma {
     userId?: StringFilter<"Income"> | string
     type?: EnumIncomeTypeFilter<"Income"> | $Enums.IncomeType
     amount?: DecimalFilter<"Income"> | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFilter<"Income"> | Decimal | DecimalJsLike | number | string
     date?: DateTimeFilter<"Income"> | Date | string
     description?: StringNullableFilter<"Income"> | string | null
     createdAt?: DateTimeFilter<"Income"> | Date | string
@@ -11087,6 +11106,7 @@ export namespace Prisma {
     userId?: SortOrder
     type?: SortOrder
     amount?: SortOrder
+    taxRate?: SortOrder
     date?: SortOrder
     description?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -11106,6 +11126,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Income"> | string
     type?: EnumIncomeTypeWithAggregatesFilter<"Income"> | $Enums.IncomeType
     amount?: DecimalWithAggregatesFilter<"Income"> | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalWithAggregatesFilter<"Income"> | Decimal | DecimalJsLike | number | string
     date?: DateTimeWithAggregatesFilter<"Income"> | Date | string
     description?: StringNullableWithAggregatesFilter<"Income"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Income"> | Date | string
@@ -11828,6 +11849,7 @@ export namespace Prisma {
     userId: string
     type: $Enums.IncomeType
     amount: Decimal | DecimalJsLike | number | string
+    taxRate?: Decimal | DecimalJsLike | number | string
     date: Date | string
     description?: string | null
     createdAt?: Date | string
@@ -11839,6 +11861,7 @@ export namespace Prisma {
     userId: string
     type: $Enums.IncomeType
     amount: Decimal | DecimalJsLike | number | string
+    taxRate?: Decimal | DecimalJsLike | number | string
     date: Date | string
     description?: string | null
     createdAt?: Date | string
@@ -11850,6 +11873,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumIncomeTypeFieldUpdateOperationsInput | $Enums.IncomeType
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11861,6 +11885,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumIncomeTypeFieldUpdateOperationsInput | $Enums.IncomeType
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11872,6 +11897,7 @@ export namespace Prisma {
     userId: string
     type: $Enums.IncomeType
     amount: Decimal | DecimalJsLike | number | string
+    taxRate?: Decimal | DecimalJsLike | number | string
     date: Date | string
     description?: string | null
     createdAt?: Date | string
@@ -11883,6 +11909,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumIncomeTypeFieldUpdateOperationsInput | $Enums.IncomeType
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11894,6 +11921,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     type?: EnumIncomeTypeFieldUpdateOperationsInput | $Enums.IncomeType
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    taxRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12602,6 +12630,7 @@ export namespace Prisma {
     userId?: SortOrder
     type?: SortOrder
     amount?: SortOrder
+    taxRate?: SortOrder
     date?: SortOrder
     description?: SortOrder
     createdAt?: SortOrder
@@ -12610,6 +12639,7 @@ export namespace Prisma {
 
   export type IncomeAvgOrderByAggregateInput = {
     amount?: SortOrder
+    taxRate?: SortOrder
   }
 
   export type IncomeMaxOrderByAggregateInput = {
@@ -12617,6 +12647,7 @@ export namespace Prisma {
     userId?: SortOrder
     type?: SortOrder
     amount?: SortOrder
+    taxRate?: SortOrder
     date?: SortOrder
     description?: SortOrder
     createdAt?: SortOrder
@@ -12628,6 +12659,7 @@ export namespace Prisma {
     userId?: SortOrder
     type?: SortOrder
     amount?: SortOrder
+    taxRate?: SortOrder
     date?: SortOrder
     description?: SortOrder
     createdAt?: SortOrder
@@ -12636,6 +12668,7 @@ export namespace Prisma {
 
   export type IncomeSumOrderByAggregateInput = {
     amount?: SortOrder
+    taxRate?: SortOrder
   }
 
   export type EnumIncomeTypeWithAggregatesFilter<$PrismaModel = never> = {

@@ -18,32 +18,38 @@ Rules:
 - Do not invent data. If unsure, leave the field as null or empty.`;
 
 type ClassifyBillFileInput = {
-  file: Uint8Array | Buffer | ArrayBuffer;
-  fileName?: string;
+	file: Uint8Array | Buffer | ArrayBuffer;
+	fileName?: string;
 };
 
-export async function classifyBillFile({ file, fileName }: ClassifyBillFileInput): Promise<ClassifiedBill> {
-  const model = getProviderModel();
-  const { object } = await generateObject({
-    model,
-    system: SYSTEM_PROMPT,
-    schema: classifiedBillSchema,
-    schemaName: "classified_bill",
-    messages: [
-      {
-        role: "user",
-        content: [
-          { type: "text", text: "Analise este PDF e extraia os lançamentos da fatura." },
-          {
-            type: "file",
-            data: file,
-            mediaType: "application/pdf",
-            filename: fileName ?? "fatura.pdf",
-          },
-        ],
-      },
-    ],
-  });
+export async function classifyBillFile({
+	file,
+	fileName,
+}: ClassifyBillFileInput): Promise<ClassifiedBill> {
+	const model = getProviderModel();
+	const { object } = await generateObject({
+		model,
+		system: SYSTEM_PROMPT,
+		schema: classifiedBillSchema,
+		schemaName: "classified_bill",
+		messages: [
+			{
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: "Analise este PDF e extraia os lançamentos da fatura.",
+					},
+					{
+						type: "file",
+						data: file,
+						mediaType: "application/pdf",
+						filename: fileName ?? "fatura.pdf",
+					},
+				],
+			},
+		],
+	});
 
-  return object;
+	return object;
 }

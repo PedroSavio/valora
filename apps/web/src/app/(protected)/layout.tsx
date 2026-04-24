@@ -5,22 +5,22 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 
 export default async function ProtectedLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	});
 
-  if (!session?.user) {
-    redirect("/login");
-  }
+	if (!session?.user) {
+		redirect("/login");
+	}
 
-  return (
-    <div className="dark flex h-svh bg-background text-foreground">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">{children}</main>
-    </div>
-  );
+	return (
+		<div className="dark flex h-svh bg-background text-foreground">
+			<Sidebar />
+			<main className="flex-1 overflow-y-auto">{children}</main>
+		</div>
+	);
 }

@@ -1,48 +1,48 @@
 {
-  "name": "valora",
-  "private": true,
-  "workspaces": {
-    "packages": [
-      "apps/*",
-      "packages/*"
-    ],
-    "catalog": {
-      "dotenv": "^17.2.2",
-      "zod": "^4.1.13",
-      "typescript": "^6",
-      "lucide-react": "^0.546.0",
-      "next-themes": "^0.4.6",
-      "react": "^19.2.3",
-      "react-dom": "^19.2.3",
-      "sonner": "^2.0.5",
-      "better-auth": "1.5.5",
-      "@types/react": "^19.2.10",
-      "@types/react-dom": "^19.2.3",
-      "tailwindcss": "^4.1.18"
-    }
-  },
-  "type": "module",
-  "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "check-types": "turbo check-types",
-    "dev:web": "turbo -F web dev",
-    "check": "biome check --write .",
-    "db:migrate": "bun --cwd packages/auth run db:migrate",
-    "db:generate": "bun --cwd packages/auth run db:generate",
-    "db:regen": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object { $_.ProcessName -match 'node|bun|next|prisma' } | Stop-Process -Force -ErrorAction SilentlyContinue; Remove-Item -Force 'packages/auth/src/generated/prisma/query_engine-windows.dll.node*' -ErrorAction SilentlyContinue; bun --cwd packages/auth run db:generate\""
-  },
-  "dependencies": {
-    "@valora/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.2.0",
-    "@types/node": "^22.13.14",
-    "@valora/config": "workspace:*",
-    "turbo": "^2.8.12",
-    "typescript": "catalog:"
-  },
-  "packageManager": "bun@1.2.19"
+	"name": "valora",
+	"private": true,
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		],
+		"catalog": {
+			"dotenv": "^17.2.2",
+			"zod": "^4.1.13",
+			"typescript": "^6",
+			"lucide-react": "^0.546.0",
+			"next-themes": "^0.4.6",
+			"react": "^19.2.3",
+			"react-dom": "^19.2.3",
+			"sonner": "^2.0.5",
+			"better-auth": "1.5.5",
+			"@types/react": "^19.2.10",
+			"@types/react-dom": "^19.2.3",
+			"tailwindcss": "^4.1.18"
+		}
+	},
+	"type": "module",
+	"scripts": {
+		"dev": "turbo dev",
+		"build": "turbo build",
+		"check-types": "turbo check-types",
+		"dev:web": "turbo -F web dev",
+		"check": "biome check --write .",
+		"db:migrate": "bun --cwd packages/auth run db:migrate",
+		"db:generate": "bun --cwd packages/auth run db:generate",
+		"db:regen": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Get-Process | Where-Object { $_.ProcessName -match 'node|bun|next|prisma' } | Stop-Process -Force -ErrorAction SilentlyContinue; Remove-Item -Force 'packages/auth/src/generated/prisma/query_engine-windows.dll.node*' -ErrorAction SilentlyContinue; bun --cwd packages/auth run db:generate\""
+	},
+	"dependencies": {
+		"@valora/env": "workspace:*",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.2.0",
+		"@types/node": "^22.13.14",
+		"@valora/config": "workspace:*",
+		"turbo": "^2.8.12",
+		"typescript": "catalog:"
+	},
+	"packageManager": "bun@1.2.19"
 }

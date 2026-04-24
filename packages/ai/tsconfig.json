@@ -1,4 +1,4 @@
 {
-  "extends": "@valora/config/tsconfig.base.json",
-  "include": ["src"]
+	"extends": "@valora/config/tsconfig.base.json",
+	"include": ["src"]
 }

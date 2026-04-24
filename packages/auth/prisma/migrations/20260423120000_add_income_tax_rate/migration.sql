@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `income` ADD COLUMN `taxRate` DECIMAL(5, 2) NOT NULL DEFAULT 0;

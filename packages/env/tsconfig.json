@@ -1,3 +1,3 @@
 {
-  "extends": "@valora/config/tsconfig.base.json"
+	"extends": "@valora/config/tsconfig.base.json"
 }

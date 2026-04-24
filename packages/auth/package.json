@@ -1,29 +1,29 @@
 {
-  "name": "@valora/auth",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {
-    "db:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
-    "db:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma"
-  },
-  "dependencies": {
-    "@prisma/client": "5.22.0",
-    "@valora/env": "workspace:*",
-    "better-auth": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@valora/config": "workspace:*",
-    "prisma": "5.22.0",
-    "typescript": "catalog:"
-  }
+	"name": "@valora/auth",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {
+		"db:generate": "prisma generate --schema=./prisma/schema.prisma",
+		"db:migrate": "prisma migrate dev --schema=./prisma/schema.prisma",
+		"db:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma"
+	},
+	"dependencies": {
+		"@prisma/client": "5.22.0",
+		"@valora/env": "workspace:*",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@valora/config": "workspace:*",
+		"prisma": "5.22.0",
+		"typescript": "catalog:"
+	}
 }
